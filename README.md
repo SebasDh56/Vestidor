@@ -54,6 +54,20 @@ Los frames se procesan temporalmente en el dispositivo. No se envía ni se guard
 
 MediaPipe y su modelo se cargan desde los endpoints públicos oficiales/CDN al activar el probador. La inferencia se limita aproximadamente a 15 FPS para equilibrar estabilidad y rendimiento; el render continúa con `requestAnimationFrame`.
 
+## Hosting en OpenAI Sites y consumo
+
+El prototipo no llama a la API de OpenAI ni a ningún modelo generativo durante la navegación, el uso de la cámara o la administración. Por tanto, usar el sitio no consume tokens. El seguimiento corporal se ejecuta localmente en el navegador con MediaPipe.
+
+Los únicos recursos persistentes del hosting son:
+
+- D1 para la información del catálogo y el administrador;
+- R2 para las imágenes cargadas desde `/admin`;
+- transferencia y ejecución normal del sitio.
+
+Para mantener bajo el consumo, las imágenes de R2 se publican con caché de un año, cada archivo se limita a 5 MB y el video de la cámara nunca se sube al servidor. La configuración de Sites se conserva en `.openai/hosting.json`; los recursos reales y sus credenciales son administrados por la plataforma.
+
+Antes de hacer pública una instalación nueva, el propietario debe entrar primero en `/admin`: esa primera identidad autenticada queda registrada como administrador inicial.
+
 ## Limitaciones reales del MVP
 
 - El render es AR 2D deformable anclado a landmarks; no es aún una simulación física 3D de tela.
