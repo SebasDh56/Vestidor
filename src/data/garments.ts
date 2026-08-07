@@ -7,6 +7,12 @@ export const STANDARD_SIZE_CHART: SizeChartEntry[] = [
   { size: "XL", chestMin: 106, chestMax: 116, shoulderWidth: 44, garmentLength: 65 },
 ];
 
+export const KILLA_SIZE_CHART: SizeChartEntry[] = [
+  { size: "S", chestMin: 84, chestMax: 90, shoulderWidth: 43, garmentLength: 58 },
+  { size: "M", chestMin: 90, chestMax: 96, shoulderWidth: 45, garmentLength: 60 },
+  { size: "L", chestMin: 96, chestMax: 104, shoulderWidth: 47, garmentLength: 64 },
+];
+
 export const DEFAULT_GARMENTS: Garment[] = [
   {
     id: 1,
@@ -19,12 +25,12 @@ export const DEFAULT_GARMENTS: Garment[] = [
     color: "Marfil natural",
     imageUrl: "/images/products/chaqueta-killa-reference.png",
     imageKey: null,
-    imageFocus: "right",
+    imageFocus: "center",
     overlayColor: "#d8cbb5",
     overlayAccent: "#a54428",
     featured: true,
-    sizes: ["S", "M", "L", "XL"],
-    sizeChart: STANDARD_SIZE_CHART,
+    sizes: ["S", "M", "L"],
+    sizeChart: KILLA_SIZE_CHART,
   },
   {
     id: 2,

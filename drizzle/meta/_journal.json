@@ -8,6 +8,13 @@
       "when": 1786078268635,
       "tag": "0000_mature_klaw",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1786146068927,
+      "tag": "0001_update_killa_garment",
+      "breakpoints": true
     }
   ]
 }
