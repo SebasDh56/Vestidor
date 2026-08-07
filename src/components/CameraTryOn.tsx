@@ -107,6 +107,10 @@ export function CameraTryOn({
   }, [stopStream]);
 
   useEffect(() => {
+    void fittingEngine.prepareGarment(garment);
+  }, [garment]);
+
+  useEffect(() => {
     if (cameraState !== "ready") return;
     let animationFrame = 0;
     let cancelled = false;

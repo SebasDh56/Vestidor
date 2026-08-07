@@ -19,6 +19,29 @@ const CONNECTIONS = [
 type Point = { x: number; y: number };
 
 export class VirtualTryOnEngine {
+  private readonly textures = new Map<string, HTMLImageElement>();
+  private readonly texturePromises = new Map<string, Promise<void>>();
+
+  prepareGarment(garment: Garment): Promise<void> {
+    const source = this.textureSource(garment);
+    if (!source || this.textures.has(garment.slug)) return Promise.resolve();
+    const pending = this.texturePromises.get(garment.slug);
+    if (pending) return pending;
+
+    const promise = new Promise<void>((resolve) => {
+      const image = new Image();
+      image.decoding = "async";
+      image.onload = () => {
+        this.textures.set(garment.slug, image);
+        resolve();
+      };
+      image.onerror = () => resolve();
+      image.src = source;
+    });
+    this.texturePromises.set(garment.slug, promise);
+    return promise;
+  }
+
   render(
     context: CanvasRenderingContext2D,
     landmarks: NormalizedLandmark[],
@@ -56,6 +79,21 @@ export class VirtualTryOnEngine {
     const halfWidth = shoulderSpan * 0.59 * scale.width;
     const hemY = shoulderMid.y + torsoHeight * 1.12 * scale.length;
     const centerX = shoulderMid.x;
+
+    const texture = this.textures.get(garment.slug);
+    if (texture) {
+      this.drawTexturedGarment(
+        context,
+        texture,
+        shoulderLeft,
+        shoulderRight,
+        shoulderMid,
+        shoulderSpan,
+        scale,
+      );
+      if (debug) this.drawDebug(context, landmarks);
+      return;
+    }
 
     context.save();
     context.globalAlpha = 0.87;
@@ -125,6 +163,42 @@ export class VirtualTryOnEngine {
     context.restore();
 
     if (debug) this.drawDebug(context, landmarks);
+  }
+
+  private textureSource(garment: Garment): string | null {
+    return garment.slug === "chaqueta-killa-marfil"
+      ? "/images/products/chaqueta-killa-tryon.png"
+      : null;
+  }
+
+  private drawTexturedGarment(
+    context: CanvasRenderingContext2D,
+    texture: HTMLImageElement,
+    shoulderLeft: Point,
+    shoulderRight: Point,
+    shoulderMid: Point,
+    shoulderSpan: number,
+    scale: { width: number; length: number; sleeve: number },
+  ) {
+    const shoulderAngle = Math.atan2(
+      shoulderRight.y - shoulderLeft.y,
+      shoulderRight.x - shoulderLeft.x,
+    );
+    const width = shoulderSpan * 1.88 * scale.width;
+    const sourceRatio = texture.naturalHeight / texture.naturalWidth;
+    const height = width * sourceRatio * (scale.length / scale.width);
+
+    context.save();
+    context.translate(shoulderMid.x, shoulderMid.y);
+    context.rotate(shoulderAngle);
+    context.globalAlpha = 0.97;
+    context.imageSmoothingEnabled = true;
+    context.imageSmoothingQuality = "high";
+    context.shadowColor = "rgba(42, 31, 24, .16)";
+    context.shadowBlur = Math.max(4, shoulderSpan * 0.025);
+    context.shadowOffsetY = Math.max(2, shoulderSpan * 0.012);
+    context.drawImage(texture, -width / 2, -height * 0.095, width, height);
+    context.restore();
   }
 
   private drawSleeve(
