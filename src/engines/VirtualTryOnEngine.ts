@@ -75,6 +75,8 @@ export class VirtualTryOnEngine {
     const elbowRight = point(13);
     const wristLeft = point(16);
     const wristRight = point(15);
+    const handLeft = [point(18), point(20), point(22)];
+    const handRight = [point(17), point(19), point(21)];
     const scale = SIZE_SCALE[size];
 
     const shoulderMid = {
@@ -97,6 +99,8 @@ export class VirtualTryOnEngine {
         texture,
         shoulderLeft,
         shoulderRight,
+        hipLeft,
+        hipRight,
         elbowLeft,
         elbowRight,
         wristLeft,
@@ -106,6 +110,9 @@ export class VirtualTryOnEngine {
         torsoHeight,
         scale,
       );
+      this.applyNaturalShading(context, shoulderMid, shoulderSpan, torsoHeight);
+      this.revealHands(context, wristLeft, handLeft, shoulderSpan);
+      this.revealHands(context, wristRight, handRight, shoulderSpan);
       if (debug) this.drawDebug(context, landmarks);
       return;
     }
@@ -191,6 +198,8 @@ export class VirtualTryOnEngine {
     texture: TextureLayers,
     shoulderLeft: Point,
     shoulderRight: Point,
+    hipLeft: Point,
+    hipRight: Point,
     elbowLeft: Point,
     elbowRight: Point,
     wristLeft: Point,
@@ -227,22 +236,152 @@ export class VirtualTryOnEngine {
     this.drawTextureSegment(context, texture.leftUpper, source.leftShoulder, source.leftElbow, fittedShoulderLeft, elbowLeft);
     this.drawTextureSegment(context, texture.rightUpper, source.rightShoulder, source.rightElbow, fittedShoulderRight, elbowRight);
 
-    const shoulderAngle = Math.atan2(
-      fittedShoulderRight.y - fittedShoulderLeft.y,
-      fittedShoulderRight.x - fittedShoulderLeft.x,
+    const hipMid = this.midpoint(hipLeft, hipRight);
+    const fittedHipLeft = this.scaleFrom(hipMid, hipLeft, scale.width * 1.04);
+    const fittedHipRight = this.scaleFrom(hipMid, hipRight, scale.width * 1.04);
+    this.drawWarpedTorso(
+      context,
+      texture,
+      fittedShoulderLeft,
+      fittedShoulderRight,
+      fittedHipLeft,
+      fittedHipRight,
+      shoulderMid,
+      torsoHeight,
+      scale.length,
     );
-    context.translate(shoulderMid.x, shoulderMid.y);
-    context.rotate(shoulderAngle);
-    const sourceShoulderSpan = texture.width * 0.49;
-    const sourceTorsoHeight = texture.height * 0.76;
-    const torsoScaleX = (shoulderSpan * scale.width * 1.08) / sourceShoulderSpan;
-    const torsoScaleY = (torsoHeight * scale.length * 1.18) / sourceTorsoHeight;
-    context.scale(torsoScaleX, torsoScaleY);
-    context.drawImage(
-      texture.torso,
-      -texture.width * 0.5,
-      -texture.height * 0.14,
+    context.restore();
+  }
+
+  private drawWarpedTorso(
+    context: CanvasRenderingContext2D,
+    texture: TextureLayers,
+    shoulderLeft: Point,
+    shoulderRight: Point,
+    hipLeft: Point,
+    hipRight: Point,
+    shoulderMid: Point,
+    torsoHeight: number,
+    lengthScale: number,
+  ) {
+    const sourceRows = [
+      [this.sourcePoint(texture, 0.255, 0.14), this.sourcePoint(texture, 0.5, 0.14), this.sourcePoint(texture, 0.745, 0.14)],
+      [this.sourcePoint(texture, 0.245, 0.46), this.sourcePoint(texture, 0.5, 0.46), this.sourcePoint(texture, 0.755, 0.46)],
+      [this.sourcePoint(texture, 0.27, 0.73), this.sourcePoint(texture, 0.5, 0.92), this.sourcePoint(texture, 0.73, 0.73)],
+    ];
+
+    const middleLeft = this.lerp(shoulderLeft, hipLeft, 0.55);
+    const middleRight = this.lerp(shoulderRight, hipRight, 0.55);
+    const middleCenter = this.midpoint(middleLeft, middleRight);
+    const hemY = shoulderMid.y + torsoHeight * 1.18 * lengthScale;
+    const hipMid = this.midpoint(hipLeft, hipRight);
+    const hemLeft = this.scaleFrom(hipMid, hipLeft, 1.12);
+    const hemRight = this.scaleFrom(hipMid, hipRight, 1.12);
+    const destinationRows = [
+      [shoulderLeft, shoulderMid, shoulderRight],
+      [middleLeft, middleCenter, middleRight],
+      [
+        { x: hemLeft.x, y: hemY },
+        { x: hipMid.x, y: hemY + torsoHeight * 0.17 * lengthScale },
+        { x: hemRight.x, y: hemY },
+      ],
+    ];
+
+    for (let row = 0; row < 2; row += 1) {
+      for (let column = 0; column < 2; column += 1) {
+        const sourceTopLeft = sourceRows[row][column];
+        const sourceTopRight = sourceRows[row][column + 1];
+        const sourceBottomLeft = sourceRows[row + 1][column];
+        const sourceBottomRight = sourceRows[row + 1][column + 1];
+        const destinationTopLeft = destinationRows[row][column];
+        const destinationTopRight = destinationRows[row][column + 1];
+        const destinationBottomLeft = destinationRows[row + 1][column];
+        const destinationBottomRight = destinationRows[row + 1][column + 1];
+
+        this.drawTexturedTriangle(context, texture.torso, [sourceTopLeft, sourceTopRight, sourceBottomLeft], [destinationTopLeft, destinationTopRight, destinationBottomLeft]);
+        this.drawTexturedTriangle(context, texture.torso, [sourceTopRight, sourceBottomRight, sourceBottomLeft], [destinationTopRight, destinationBottomRight, destinationBottomLeft]);
+      }
+    }
+  }
+
+  private drawTexturedTriangle(
+    context: CanvasRenderingContext2D,
+    image: CanvasImageSource,
+    source: [Point, Point, Point],
+    destination: [Point, Point, Point],
+  ) {
+    const [s0, s1, s2] = source;
+    const [d0, d1, d2] = destination;
+    const denominator = s0.x * (s1.y - s2.y) + s1.x * (s2.y - s0.y) + s2.x * (s0.y - s1.y);
+    if (Math.abs(denominator) < 0.001) return;
+
+    const a = (d0.x * (s1.y - s2.y) + d1.x * (s2.y - s0.y) + d2.x * (s0.y - s1.y)) / denominator;
+    const b = (d0.y * (s1.y - s2.y) + d1.y * (s2.y - s0.y) + d2.y * (s0.y - s1.y)) / denominator;
+    const c = (d0.x * (s2.x - s1.x) + d1.x * (s0.x - s2.x) + d2.x * (s1.x - s0.x)) / denominator;
+    const d = (d0.y * (s2.x - s1.x) + d1.y * (s0.x - s2.x) + d2.y * (s1.x - s0.x)) / denominator;
+    const e = (d0.x * (s1.x * s2.y - s2.x * s1.y) + d1.x * (s2.x * s0.y - s0.x * s2.y) + d2.x * (s0.x * s1.y - s1.x * s0.y)) / denominator;
+    const f = (d0.y * (s1.x * s2.y - s2.x * s1.y) + d1.y * (s2.x * s0.y - s0.x * s2.y) + d2.y * (s0.x * s1.y - s1.x * s0.y)) / denominator;
+
+    context.save();
+    context.beginPath();
+    context.moveTo(d0.x, d0.y);
+    context.lineTo(d1.x, d1.y);
+    context.lineTo(d2.x, d2.y);
+    context.closePath();
+    context.clip();
+    context.setTransform(a, b, c, d, e, f);
+    context.drawImage(image, 0, 0);
+    context.restore();
+  }
+
+  private applyNaturalShading(
+    context: CanvasRenderingContext2D,
+    shoulderMid: Point,
+    shoulderSpan: number,
+    torsoHeight: number,
+  ) {
+    context.save();
+    context.globalCompositeOperation = "source-atop";
+    const horizontal = context.createLinearGradient(
+      shoulderMid.x - shoulderSpan,
+      0,
+      shoulderMid.x + shoulderSpan,
+      0,
     );
+    horizontal.addColorStop(0, "rgba(35, 24, 18, .16)");
+    horizontal.addColorStop(0.28, "rgba(255, 255, 255, .05)");
+    horizontal.addColorStop(0.52, "rgba(255, 255, 255, .11)");
+    horizontal.addColorStop(0.78, "rgba(255, 255, 255, .03)");
+    horizontal.addColorStop(1, "rgba(35, 24, 18, .17)");
+    context.fillStyle = horizontal;
+    context.fillRect(
+      shoulderMid.x - shoulderSpan * 1.35,
+      shoulderMid.y - shoulderSpan * 0.25,
+      shoulderSpan * 2.7,
+      torsoHeight * 1.7,
+    );
+    context.restore();
+  }
+
+  private revealHands(
+    context: CanvasRenderingContext2D,
+    wrist: Point,
+    handPoints: Point[],
+    shoulderSpan: number,
+  ) {
+    const hand = handPoints.reduce(
+      (sum, point) => ({ x: sum.x + point.x / handPoints.length, y: sum.y + point.y / handPoints.length }),
+      { x: 0, y: 0 },
+    );
+    const start = this.lerp(wrist, hand, 0.22);
+    context.save();
+    context.globalCompositeOperation = "destination-out";
+    context.lineCap = "round";
+    context.lineWidth = Math.max(16, shoulderSpan * 0.095);
+    context.beginPath();
+    context.moveTo(start.x, start.y);
+    context.lineTo(hand.x, hand.y);
+    context.stroke();
     context.restore();
   }
 
@@ -309,6 +448,17 @@ export class VirtualTryOnEngine {
     return {
       x: origin.x + (point.x - origin.x) * factor,
       y: origin.y + (point.y - origin.y) * factor,
+    };
+  }
+
+  private midpoint(a: Point, b: Point): Point {
+    return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+  }
+
+  private lerp(a: Point, b: Point, amount: number): Point {
+    return {
+      x: a.x + (b.x - a.x) * amount,
+      y: a.y + (b.y - a.y) * amount,
     };
   }
 
