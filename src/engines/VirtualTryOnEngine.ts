@@ -31,8 +31,6 @@ type TextureLayers = {
 export class VirtualTryOnEngine {
   private readonly textures = new Map<string, TextureLayers>();
   private readonly texturePromises = new Map<string, Promise<void>>();
-  private andeanPatternCanvas: HTMLCanvasElement | null = null;
-  private fabricPatternCanvas: HTMLCanvasElement | null = null;
 
   prepareGarment(garment: Garment): Promise<void> {
     const source = this.textureSource(garment);
@@ -295,7 +293,6 @@ export class VirtualTryOnEngine {
     base.addColorStop(1, "#c9b59d");
     context.fillStyle = base;
     context.fill(sleeve);
-    this.fillFabricTexture(context, sleeve);
 
     context.strokeStyle = "rgba(105, 82, 61, .28)";
     context.lineWidth = Math.max(1.2, topWidth * 0.018);
@@ -370,8 +367,6 @@ export class VirtualTryOnEngine {
     context.fillStyle = panelGradient;
     context.fill(leftPanel);
     context.fill(rightPanel);
-    this.fillFabricTexture(context, leftPanel);
-    this.fillFabricTexture(context, rightPanel);
 
     context.strokeStyle = "rgba(111, 87, 65, .35)";
     context.lineWidth = Math.max(1.2, shoulderSpan * 0.009);
@@ -413,90 +408,33 @@ export class VirtualTryOnEngine {
     }
   }
 
-  private fillFabricTexture(context: CanvasRenderingContext2D, path: Path2D) {
-    const texture = this.getFabricPatternCanvas();
-    const pattern = context.createPattern(texture, "repeat");
-    if (!pattern) return;
-    context.save();
-    context.clip(path);
-    context.globalAlpha = 0.3;
-    context.fillStyle = pattern;
-    context.fillRect(0, 0, context.canvas.width, context.canvas.height);
-    context.restore();
-  }
-
   private fillAndeanPattern(
     context: CanvasRenderingContext2D,
     path: Path2D,
     start: Point,
     end: Point,
   ) {
-    const texture = this.getAndeanPatternCanvas();
-    const pattern = context.createPattern(texture, "repeat");
-    if (!pattern) return;
     context.save();
     context.clip(path);
     const angle = Math.atan2(end.y - start.y, end.x - start.x);
+    const length = Math.max(1, Math.hypot(end.x - start.x, end.y - start.y));
+    const colors = ["#c74b32", "#ed8b35", "#19777a", "#dfb73d", "#19374b", "#d95e3d"];
     context.translate(start.x, start.y);
     context.rotate(angle);
-    context.fillStyle = pattern;
-    context.fillRect(-context.canvas.width, -context.canvas.height, context.canvas.width * 2, context.canvas.height * 2);
+    const stripeWidth = Math.max(7, length / colors.length);
+    for (let index = -3; index < colors.length + 5; index += 1) {
+      context.fillStyle = colors[((index % colors.length) + colors.length) % colors.length];
+      context.fillRect(index * stripeWidth, -context.canvas.height, stripeWidth + 1, context.canvas.height * 2);
+    }
+    context.strokeStyle = "rgba(255,255,255,.58)";
+    context.lineWidth = Math.max(1, stripeWidth * 0.08);
+    for (let index = -3; index < colors.length + 5; index += 1) {
+      context.beginPath();
+      context.moveTo(index * stripeWidth, -context.canvas.height);
+      context.lineTo(index * stripeWidth, context.canvas.height);
+      context.stroke();
+    }
     context.restore();
-  }
-
-  private getFabricPatternCanvas(): HTMLCanvasElement {
-    if (this.fabricPatternCanvas) return this.fabricPatternCanvas;
-    const canvas = document.createElement("canvas");
-    canvas.width = 48;
-    canvas.height = 48;
-    const context = canvas.getContext("2d");
-    if (context) {
-      context.clearRect(0, 0, 48, 48);
-      context.strokeStyle = "rgba(88, 65, 44, .16)";
-      context.lineWidth = 0.65;
-      for (let i = -48; i < 96; i += 5) {
-        context.beginPath(); context.moveTo(i, 0); context.lineTo(i + 48, 48); context.stroke();
-        context.beginPath(); context.moveTo(i + 48, 0); context.lineTo(i, 48); context.stroke();
-      }
-      context.fillStyle = "rgba(255,255,255,.2)";
-      for (let y = 3; y < 48; y += 8) for (let x = 4; x < 48; x += 9) context.fillRect(x, y, 1, 1);
-    }
-    this.fabricPatternCanvas = canvas;
-    return canvas;
-  }
-
-  private getAndeanPatternCanvas(): HTMLCanvasElement {
-    if (this.andeanPatternCanvas) return this.andeanPatternCanvas;
-    const canvas = document.createElement("canvas");
-    canvas.width = 216;
-    canvas.height = 72;
-    const context = canvas.getContext("2d");
-    if (context) {
-      const colors = ["#c8492e", "#ef8d32", "#197b80", "#e4ba38", "#102e46", "#db6040"];
-      context.fillStyle = "#ead8ad";
-      context.fillRect(0, 0, canvas.width, canvas.height);
-      colors.forEach((color, index) => {
-        const x = index * 36;
-        context.fillStyle = color;
-        context.fillRect(x, 0, 36, 72);
-        context.strokeStyle = index % 2 ? "#f2db9e" : "#102e46";
-        context.lineWidth = 4;
-        context.beginPath();
-        context.moveTo(x + 3, 36);
-        context.lineTo(x + 18, 12);
-        context.lineTo(x + 33, 36);
-        context.lineTo(x + 18, 60);
-        context.closePath();
-        context.stroke();
-        context.fillStyle = "rgba(255,255,255,.28)";
-        context.fillRect(x + 16, 25, 4, 22);
-      });
-      context.fillStyle = "#f3e6bf";
-      context.fillRect(0, 0, 216, 5);
-      context.fillRect(0, 67, 216, 5);
-    }
-    this.andeanPatternCanvas = canvas;
-    return canvas;
   }
 
   private segmentNormal(start: Point, end: Point): Point {
