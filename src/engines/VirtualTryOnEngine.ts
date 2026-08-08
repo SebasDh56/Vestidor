@@ -31,6 +31,8 @@ type TextureLayers = {
 export class VirtualTryOnEngine {
   private readonly textures = new Map<string, TextureLayers>();
   private readonly texturePromises = new Map<string, Promise<void>>();
+  private andeanPatternCanvas: HTMLCanvasElement | null = null;
+  private fabricPatternCanvas: HTMLCanvasElement | null = null;
 
   prepareGarment(garment: Garment): Promise<void> {
     const source = this.textureSource(garment);
@@ -91,6 +93,29 @@ export class VirtualTryOnEngine {
     const halfWidth = shoulderSpan * 0.59 * scale.width;
     const hemY = shoulderMid.y + torsoHeight * 1.12 * scale.length;
     const centerX = shoulderMid.x;
+
+    if (garment.slug === "chaqueta-killa-marfil") {
+      this.drawProceduralKilla(
+        context,
+        shoulderLeft,
+        shoulderRight,
+        hipLeft,
+        hipRight,
+        elbowLeft,
+        elbowRight,
+        wristLeft,
+        wristRight,
+        shoulderMid,
+        shoulderSpan,
+        torsoHeight,
+        scale,
+      );
+      this.applyNaturalShading(context, shoulderMid, shoulderSpan, torsoHeight);
+      this.revealHands(context, wristLeft, handLeft, shoulderSpan);
+      this.revealHands(context, wristRight, handRight, shoulderSpan);
+      if (debug) this.drawDebug(context, landmarks);
+      return;
+    }
 
     const texture = this.textures.get(garment.slug);
     if (texture) {
@@ -188,9 +213,302 @@ export class VirtualTryOnEngine {
   }
 
   private textureSource(garment: Garment): string | null {
-    return garment.slug === "chaqueta-killa-marfil"
-      ? "/images/products/chaqueta-killa-tryon.png"
-      : null;
+    return null;
+  }
+
+  private drawProceduralKilla(
+    context: CanvasRenderingContext2D,
+    shoulderLeft: Point,
+    shoulderRight: Point,
+    hipLeft: Point,
+    hipRight: Point,
+    elbowLeft: Point,
+    elbowRight: Point,
+    wristLeft: Point,
+    wristRight: Point,
+    shoulderMid: Point,
+    shoulderSpan: number,
+    torsoHeight: number,
+    scale: { width: number; length: number; sleeve: number },
+  ) {
+    const fittedShoulderLeft = this.scaleFrom(shoulderMid, shoulderLeft, scale.width * 1.06);
+    const fittedShoulderRight = this.scaleFrom(shoulderMid, shoulderRight, scale.width * 1.06);
+    const fittedWristLeft = this.scaleFrom(elbowLeft, wristLeft, scale.sleeve);
+    const fittedWristRight = this.scaleFrom(elbowRight, wristRight, scale.sleeve);
+    const hipMid = this.midpoint(hipLeft, hipRight);
+    const fittedHipLeft = this.scaleFrom(hipMid, hipLeft, scale.width * 1.12);
+    const fittedHipRight = this.scaleFrom(hipMid, hipRight, scale.width * 1.12);
+    const sleeveTopWidth = shoulderSpan * 0.29 * scale.width;
+    const sleeveEndWidth = shoulderSpan * 0.18 * scale.width;
+
+    context.save();
+    context.globalAlpha = 0.96;
+    context.lineJoin = "round";
+    context.lineCap = "round";
+    context.shadowColor = "rgba(39, 27, 20, .18)";
+    context.shadowBlur = Math.max(3, shoulderSpan * 0.025);
+    context.shadowOffsetY = Math.max(2, shoulderSpan * 0.012);
+
+    this.drawProceduralSleeve(context, fittedShoulderLeft, elbowLeft, fittedWristLeft, sleeveTopWidth, sleeveEndWidth);
+    this.drawProceduralSleeve(context, fittedShoulderRight, elbowRight, fittedWristRight, sleeveTopWidth, sleeveEndWidth);
+
+    const hemY = shoulderMid.y + torsoHeight * 1.18 * scale.length;
+    this.drawKillaFrontPanels(
+      context,
+      fittedShoulderLeft,
+      fittedShoulderRight,
+      fittedHipLeft,
+      fittedHipRight,
+      shoulderMid,
+      shoulderSpan,
+      torsoHeight,
+      hemY,
+    );
+    context.restore();
+  }
+
+  private drawProceduralSleeve(
+    context: CanvasRenderingContext2D,
+    shoulder: Point,
+    elbow: Point,
+    wrist: Point,
+    topWidth: number,
+    endWidth: number,
+  ) {
+    const upperNormal = this.segmentNormal(shoulder, elbow);
+    const lowerNormal = this.segmentNormal(elbow, wrist);
+    const jointNormal = this.normalized({ x: upperNormal.x + lowerNormal.x, y: upperNormal.y + lowerNormal.y });
+    const topHalf = topWidth / 2;
+    const elbowHalf = topWidth * 0.43;
+    const wristHalf = endWidth / 2;
+    const sleeve = new Path2D();
+    sleeve.moveTo(shoulder.x + upperNormal.x * topHalf, shoulder.y + upperNormal.y * topHalf);
+    sleeve.quadraticCurveTo(elbow.x + jointNormal.x * elbowHalf, elbow.y + jointNormal.y * elbowHalf, wrist.x + lowerNormal.x * wristHalf, wrist.y + lowerNormal.y * wristHalf);
+    sleeve.lineTo(wrist.x - lowerNormal.x * wristHalf, wrist.y - lowerNormal.y * wristHalf);
+    sleeve.quadraticCurveTo(elbow.x - jointNormal.x * elbowHalf, elbow.y - jointNormal.y * elbowHalf, shoulder.x - upperNormal.x * topHalf, shoulder.y - upperNormal.y * topHalf);
+    sleeve.closePath();
+
+    const base = context.createLinearGradient(shoulder.x, shoulder.y, wrist.x, wrist.y);
+    base.addColorStop(0, "#eadfce");
+    base.addColorStop(0.42, "#dfcfb9");
+    base.addColorStop(0.72, "#efe3d2");
+    base.addColorStop(1, "#c9b59d");
+    context.fillStyle = base;
+    context.fill(sleeve);
+    this.fillFabricTexture(context, sleeve);
+
+    context.strokeStyle = "rgba(105, 82, 61, .28)";
+    context.lineWidth = Math.max(1.2, topWidth * 0.018);
+    context.stroke(sleeve);
+    context.strokeStyle = "rgba(255,255,255,.25)";
+    context.lineWidth = Math.max(1, topWidth * 0.012);
+    context.beginPath();
+    context.moveTo(shoulder.x, shoulder.y);
+    context.quadraticCurveTo(elbow.x, elbow.y, wrist.x, wrist.y);
+    context.stroke();
+
+    const cuffStart = this.lerp(elbow, wrist, 0.72);
+    const cuffHalfStart = wristHalf * 1.12;
+    const cuff = new Path2D();
+    cuff.moveTo(cuffStart.x + lowerNormal.x * cuffHalfStart, cuffStart.y + lowerNormal.y * cuffHalfStart);
+    cuff.lineTo(wrist.x + lowerNormal.x * wristHalf, wrist.y + lowerNormal.y * wristHalf);
+    cuff.lineTo(wrist.x - lowerNormal.x * wristHalf, wrist.y - lowerNormal.y * wristHalf);
+    cuff.lineTo(cuffStart.x - lowerNormal.x * cuffHalfStart, cuffStart.y - lowerNormal.y * cuffHalfStart);
+    cuff.closePath();
+    this.fillAndeanPattern(context, cuff, cuffStart, wrist);
+    context.strokeStyle = "rgba(20, 35, 46, .48)";
+    context.lineWidth = Math.max(1.2, endWidth * 0.025);
+    context.stroke(cuff);
+  }
+
+  private drawKillaFrontPanels(
+    context: CanvasRenderingContext2D,
+    shoulderLeft: Point,
+    shoulderRight: Point,
+    hipLeft: Point,
+    hipRight: Point,
+    shoulderMid: Point,
+    shoulderSpan: number,
+    torsoHeight: number,
+    hemY: number,
+  ) {
+    const innerTopLeft = { x: shoulderMid.x - shoulderSpan * 0.13, y: shoulderMid.y - shoulderSpan * 0.035 };
+    const innerTopRight = { x: shoulderMid.x + shoulderSpan * 0.13, y: shoulderMid.y - shoulderSpan * 0.035 };
+    const innerChestLeft = { x: shoulderMid.x - shoulderSpan * 0.055, y: shoulderMid.y + torsoHeight * 0.32 };
+    const innerChestRight = { x: shoulderMid.x + shoulderSpan * 0.055, y: shoulderMid.y + torsoHeight * 0.32 };
+    const innerHemLeft = { x: shoulderMid.x - shoulderSpan * 0.025, y: hemY + torsoHeight * 0.18 };
+    const innerHemRight = { x: shoulderMid.x + shoulderSpan * 0.025, y: hemY + torsoHeight * 0.18 };
+    const sideLeft = this.lerp(shoulderLeft, hipLeft, 0.58);
+    const sideRight = this.lerp(shoulderRight, hipRight, 0.58);
+    const outerHemLeft = this.scaleFrom(this.midpoint(hipLeft, hipRight), hipLeft, 1.1);
+    const outerHemRight = this.scaleFrom(this.midpoint(hipLeft, hipRight), hipRight, 1.1);
+    outerHemLeft.y = hemY;
+    outerHemRight.y = hemY;
+
+    const leftPanel = new Path2D();
+    leftPanel.moveTo(shoulderLeft.x, shoulderLeft.y - shoulderSpan * 0.055);
+    leftPanel.quadraticCurveTo(sideLeft.x - shoulderSpan * 0.07, sideLeft.y, outerHemLeft.x, outerHemLeft.y);
+    leftPanel.lineTo(innerHemLeft.x, innerHemLeft.y);
+    leftPanel.quadraticCurveTo(innerChestLeft.x, innerChestLeft.y, innerTopLeft.x, innerTopLeft.y);
+    leftPanel.quadraticCurveTo(shoulderMid.x - shoulderSpan * 0.3, shoulderMid.y - shoulderSpan * 0.09, shoulderLeft.x, shoulderLeft.y - shoulderSpan * 0.055);
+    leftPanel.closePath();
+
+    const rightPanel = new Path2D();
+    rightPanel.moveTo(shoulderRight.x, shoulderRight.y - shoulderSpan * 0.055);
+    rightPanel.quadraticCurveTo(sideRight.x + shoulderSpan * 0.07, sideRight.y, outerHemRight.x, outerHemRight.y);
+    rightPanel.lineTo(innerHemRight.x, innerHemRight.y);
+    rightPanel.quadraticCurveTo(innerChestRight.x, innerChestRight.y, innerTopRight.x, innerTopRight.y);
+    rightPanel.quadraticCurveTo(shoulderMid.x + shoulderSpan * 0.3, shoulderMid.y - shoulderSpan * 0.09, shoulderRight.x, shoulderRight.y - shoulderSpan * 0.055);
+    rightPanel.closePath();
+
+    const panelGradient = context.createLinearGradient(shoulderLeft.x, 0, shoulderRight.x, 0);
+    panelGradient.addColorStop(0, "#cdbba4");
+    panelGradient.addColorStop(0.22, "#eadfce");
+    panelGradient.addColorStop(0.52, "#f0e5d5");
+    panelGradient.addColorStop(0.8, "#ddccb6");
+    panelGradient.addColorStop(1, "#c3ae95");
+    context.fillStyle = panelGradient;
+    context.fill(leftPanel);
+    context.fill(rightPanel);
+    this.fillFabricTexture(context, leftPanel);
+    this.fillFabricTexture(context, rightPanel);
+
+    context.strokeStyle = "rgba(111, 87, 65, .35)";
+    context.lineWidth = Math.max(1.2, shoulderSpan * 0.009);
+    context.stroke(leftPanel);
+    context.stroke(rightPanel);
+
+    const panelDepth = torsoHeight * 0.17;
+    const leftShoulderPanel = new Path2D();
+    leftShoulderPanel.moveTo(shoulderLeft.x, shoulderLeft.y - shoulderSpan * 0.055);
+    leftShoulderPanel.lineTo(innerTopLeft.x, innerTopLeft.y);
+    leftShoulderPanel.lineTo(innerChestLeft.x - shoulderSpan * 0.04, innerTopLeft.y + panelDepth);
+    leftShoulderPanel.lineTo(shoulderLeft.x + shoulderSpan * 0.02, shoulderLeft.y + panelDepth);
+    leftShoulderPanel.closePath();
+    const rightShoulderPanel = new Path2D();
+    rightShoulderPanel.moveTo(innerTopRight.x, innerTopRight.y);
+    rightShoulderPanel.lineTo(shoulderRight.x, shoulderRight.y - shoulderSpan * 0.055);
+    rightShoulderPanel.lineTo(shoulderRight.x - shoulderSpan * 0.02, shoulderRight.y + panelDepth);
+    rightShoulderPanel.lineTo(innerChestRight.x + shoulderSpan * 0.04, innerTopRight.y + panelDepth);
+    rightShoulderPanel.closePath();
+    this.fillAndeanPattern(context, leftShoulderPanel, shoulderLeft, innerChestLeft);
+    this.fillAndeanPattern(context, rightShoulderPanel, innerTopRight, shoulderRight);
+
+    context.strokeStyle = "rgba(255,255,255,.62)";
+    context.lineWidth = Math.max(1.5, shoulderSpan * 0.012);
+    context.beginPath();
+    context.moveTo(innerTopLeft.x, innerTopLeft.y);
+    context.quadraticCurveTo(innerChestLeft.x, innerChestLeft.y, innerHemLeft.x, innerHemLeft.y);
+    context.moveTo(innerTopRight.x, innerTopRight.y);
+    context.quadraticCurveTo(innerChestRight.x, innerChestRight.y, innerHemRight.x, innerHemRight.y);
+    context.stroke();
+
+    context.strokeStyle = "rgba(126, 101, 78, .16)";
+    context.lineWidth = Math.max(1, shoulderSpan * 0.006);
+    for (const offset of [-0.28, -0.18, 0.18, 0.28]) {
+      context.beginPath();
+      context.moveTo(shoulderMid.x + shoulderSpan * offset, shoulderMid.y + panelDepth);
+      context.quadraticCurveTo(shoulderMid.x + shoulderSpan * offset * 0.8, shoulderMid.y + torsoHeight * 0.58, shoulderMid.x + shoulderSpan * offset * 0.72, hemY * 0.96 + shoulderMid.y * 0.04);
+      context.stroke();
+    }
+  }
+
+  private fillFabricTexture(context: CanvasRenderingContext2D, path: Path2D) {
+    const texture = this.getFabricPatternCanvas();
+    const pattern = context.createPattern(texture, "repeat");
+    if (!pattern) return;
+    context.save();
+    context.clip(path);
+    context.globalAlpha = 0.3;
+    context.fillStyle = pattern;
+    context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+    context.restore();
+  }
+
+  private fillAndeanPattern(
+    context: CanvasRenderingContext2D,
+    path: Path2D,
+    start: Point,
+    end: Point,
+  ) {
+    const texture = this.getAndeanPatternCanvas();
+    const pattern = context.createPattern(texture, "repeat");
+    if (!pattern) return;
+    context.save();
+    context.clip(path);
+    const angle = Math.atan2(end.y - start.y, end.x - start.x);
+    context.translate(start.x, start.y);
+    context.rotate(angle);
+    context.fillStyle = pattern;
+    context.fillRect(-context.canvas.width, -context.canvas.height, context.canvas.width * 2, context.canvas.height * 2);
+    context.restore();
+  }
+
+  private getFabricPatternCanvas(): HTMLCanvasElement {
+    if (this.fabricPatternCanvas) return this.fabricPatternCanvas;
+    const canvas = document.createElement("canvas");
+    canvas.width = 48;
+    canvas.height = 48;
+    const context = canvas.getContext("2d");
+    if (context) {
+      context.clearRect(0, 0, 48, 48);
+      context.strokeStyle = "rgba(88, 65, 44, .16)";
+      context.lineWidth = 0.65;
+      for (let i = -48; i < 96; i += 5) {
+        context.beginPath(); context.moveTo(i, 0); context.lineTo(i + 48, 48); context.stroke();
+        context.beginPath(); context.moveTo(i + 48, 0); context.lineTo(i, 48); context.stroke();
+      }
+      context.fillStyle = "rgba(255,255,255,.2)";
+      for (let y = 3; y < 48; y += 8) for (let x = 4; x < 48; x += 9) context.fillRect(x, y, 1, 1);
+    }
+    this.fabricPatternCanvas = canvas;
+    return canvas;
+  }
+
+  private getAndeanPatternCanvas(): HTMLCanvasElement {
+    if (this.andeanPatternCanvas) return this.andeanPatternCanvas;
+    const canvas = document.createElement("canvas");
+    canvas.width = 216;
+    canvas.height = 72;
+    const context = canvas.getContext("2d");
+    if (context) {
+      const colors = ["#c8492e", "#ef8d32", "#197b80", "#e4ba38", "#102e46", "#db6040"];
+      context.fillStyle = "#ead8ad";
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      colors.forEach((color, index) => {
+        const x = index * 36;
+        context.fillStyle = color;
+        context.fillRect(x, 0, 36, 72);
+        context.strokeStyle = index % 2 ? "#f2db9e" : "#102e46";
+        context.lineWidth = 4;
+        context.beginPath();
+        context.moveTo(x + 3, 36);
+        context.lineTo(x + 18, 12);
+        context.lineTo(x + 33, 36);
+        context.lineTo(x + 18, 60);
+        context.closePath();
+        context.stroke();
+        context.fillStyle = "rgba(255,255,255,.28)";
+        context.fillRect(x + 16, 25, 4, 22);
+      });
+      context.fillStyle = "#f3e6bf";
+      context.fillRect(0, 0, 216, 5);
+      context.fillRect(0, 67, 216, 5);
+    }
+    this.andeanPatternCanvas = canvas;
+    return canvas;
+  }
+
+  private segmentNormal(start: Point, end: Point): Point {
+    const dx = end.x - start.x;
+    const dy = end.y - start.y;
+    const length = Math.max(0.001, Math.hypot(dx, dy));
+    return { x: -dy / length, y: dx / length };
+  }
+
+  private normalized(point: Point): Point {
+    const length = Math.max(0.001, Math.hypot(point.x, point.y));
+    return { x: point.x / length, y: point.y / length };
   }
 
   private drawTexturedGarment(
