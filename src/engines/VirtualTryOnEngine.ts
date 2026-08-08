@@ -18,8 +18,18 @@ const CONNECTIONS = [
 
 type Point = { x: number; y: number };
 
+type TextureLayers = {
+  width: number;
+  height: number;
+  torso: HTMLCanvasElement;
+  leftUpper: HTMLCanvasElement;
+  leftLower: HTMLCanvasElement;
+  rightUpper: HTMLCanvasElement;
+  rightLower: HTMLCanvasElement;
+};
+
 export class VirtualTryOnEngine {
-  private readonly textures = new Map<string, HTMLImageElement>();
+  private readonly textures = new Map<string, TextureLayers>();
   private readonly texturePromises = new Map<string, Promise<void>>();
 
   prepareGarment(garment: Garment): Promise<void> {
@@ -32,7 +42,7 @@ export class VirtualTryOnEngine {
       const image = new Image();
       image.decoding = "async";
       image.onload = () => {
-        this.textures.set(garment.slug, image);
+        this.textures.set(garment.slug, this.createTextureLayers(image));
         resolve();
       };
       image.onerror = () => resolve();
@@ -87,8 +97,13 @@ export class VirtualTryOnEngine {
         texture,
         shoulderLeft,
         shoulderRight,
+        elbowLeft,
+        elbowRight,
+        wristLeft,
+        wristRight,
         shoulderMid,
         shoulderSpan,
+        torsoHeight,
         scale,
       );
       if (debug) this.drawDebug(context, landmarks);
@@ -173,32 +188,128 @@ export class VirtualTryOnEngine {
 
   private drawTexturedGarment(
     context: CanvasRenderingContext2D,
-    texture: HTMLImageElement,
+    texture: TextureLayers,
     shoulderLeft: Point,
     shoulderRight: Point,
+    elbowLeft: Point,
+    elbowRight: Point,
+    wristLeft: Point,
+    wristRight: Point,
     shoulderMid: Point,
     shoulderSpan: number,
+    torsoHeight: number,
     scale: { width: number; length: number; sleeve: number },
   ) {
-    const shoulderAngle = Math.atan2(
-      shoulderRight.y - shoulderLeft.y,
-      shoulderRight.x - shoulderLeft.x,
-    );
-    const width = shoulderSpan * 1.88 * scale.width;
-    const sourceRatio = texture.naturalHeight / texture.naturalWidth;
-    const height = width * sourceRatio * (scale.length / scale.width);
+    const fittedShoulderLeft = this.scaleFrom(shoulderMid, shoulderLeft, scale.width);
+    const fittedShoulderRight = this.scaleFrom(shoulderMid, shoulderRight, scale.width);
+    const fittedWristLeft = this.scaleFrom(elbowLeft, wristLeft, scale.sleeve);
+    const fittedWristRight = this.scaleFrom(elbowRight, wristRight, scale.sleeve);
+
+    const source = {
+      leftShoulder: this.sourcePoint(texture, 0.255, 0.14),
+      leftElbow: this.sourcePoint(texture, 0.19, 0.5),
+      leftWrist: this.sourcePoint(texture, 0.12, 0.9),
+      rightShoulder: this.sourcePoint(texture, 0.745, 0.14),
+      rightElbow: this.sourcePoint(texture, 0.81, 0.5),
+      rightWrist: this.sourcePoint(texture, 0.88, 0.9),
+    };
 
     context.save();
-    context.translate(shoulderMid.x, shoulderMid.y);
-    context.rotate(shoulderAngle);
-    context.globalAlpha = 0.97;
+    context.globalAlpha = 0.98;
     context.imageSmoothingEnabled = true;
     context.imageSmoothingQuality = "high";
-    context.shadowColor = "rgba(42, 31, 24, .16)";
-    context.shadowBlur = Math.max(4, shoulderSpan * 0.025);
-    context.shadowOffsetY = Math.max(2, shoulderSpan * 0.012);
-    context.drawImage(texture, -width / 2, -height * 0.095, width, height);
+    context.shadowColor = "rgba(42, 31, 24, .13)";
+    context.shadowBlur = Math.max(3, shoulderSpan * 0.018);
+    context.shadowOffsetY = Math.max(1, shoulderSpan * 0.008);
+
+    this.drawTextureSegment(context, texture.leftLower, source.leftElbow, source.leftWrist, elbowLeft, fittedWristLeft);
+    this.drawTextureSegment(context, texture.rightLower, source.rightElbow, source.rightWrist, elbowRight, fittedWristRight);
+    this.drawTextureSegment(context, texture.leftUpper, source.leftShoulder, source.leftElbow, fittedShoulderLeft, elbowLeft);
+    this.drawTextureSegment(context, texture.rightUpper, source.rightShoulder, source.rightElbow, fittedShoulderRight, elbowRight);
+
+    const shoulderAngle = Math.atan2(
+      fittedShoulderRight.y - fittedShoulderLeft.y,
+      fittedShoulderRight.x - fittedShoulderLeft.x,
+    );
+    context.translate(shoulderMid.x, shoulderMid.y);
+    context.rotate(shoulderAngle);
+    const sourceShoulderSpan = texture.width * 0.49;
+    const sourceTorsoHeight = texture.height * 0.76;
+    const torsoScaleX = (shoulderSpan * scale.width * 1.08) / sourceShoulderSpan;
+    const torsoScaleY = (torsoHeight * scale.length * 1.18) / sourceTorsoHeight;
+    context.scale(torsoScaleX, torsoScaleY);
+    context.drawImage(
+      texture.torso,
+      -texture.width * 0.5,
+      -texture.height * 0.14,
+    );
     context.restore();
+  }
+
+  private createTextureLayers(image: HTMLImageElement): TextureLayers {
+    const width = image.naturalWidth;
+    const height = image.naturalHeight;
+    const layer = (points: Array<[number, number]>) => {
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const context = canvas.getContext("2d");
+      if (!context) return canvas;
+      context.beginPath();
+      points.forEach(([x, y], index) => {
+        const px = x * width;
+        const py = y * height;
+        if (index === 0) context.moveTo(px, py);
+        else context.lineTo(px, py);
+      });
+      context.closePath();
+      context.clip();
+      context.drawImage(image, 0, 0);
+      return canvas;
+    };
+
+    return {
+      width,
+      height,
+      torso: layer([[0.22, 0.07], [0.78, 0.07], [0.76, 0.45], [0.73, 0.73], [0.52, 0.92], [0.48, 0.92], [0.27, 0.73], [0.24, 0.45]]),
+      leftUpper: layer([[0.22, 0.1], [0.31, 0.16], [0.29, 0.51], [0.14, 0.59], [0.13, 0.29]]),
+      leftLower: layer([[0.13, 0.48], [0.29, 0.47], [0.2, 0.94], [0.035, 0.94]]),
+      rightUpper: layer([[0.78, 0.1], [0.69, 0.16], [0.71, 0.51], [0.86, 0.59], [0.87, 0.29]]),
+      rightLower: layer([[0.87, 0.48], [0.71, 0.47], [0.8, 0.94], [0.965, 0.94]]),
+    };
+  }
+
+  private drawTextureSegment(
+    context: CanvasRenderingContext2D,
+    layer: HTMLCanvasElement,
+    sourceStart: Point,
+    sourceEnd: Point,
+    destinationStart: Point,
+    destinationEnd: Point,
+  ) {
+    const sourceAngle = Math.atan2(sourceEnd.y - sourceStart.y, sourceEnd.x - sourceStart.x);
+    const destinationAngle = Math.atan2(destinationEnd.y - destinationStart.y, destinationEnd.x - destinationStart.x);
+    const sourceLength = Math.hypot(sourceEnd.x - sourceStart.x, sourceEnd.y - sourceStart.y);
+    const destinationLength = Math.hypot(destinationEnd.x - destinationStart.x, destinationEnd.y - destinationStart.y);
+    const segmentScale = destinationLength / Math.max(1, sourceLength);
+
+    context.save();
+    context.translate(destinationStart.x, destinationStart.y);
+    context.rotate(destinationAngle - sourceAngle);
+    context.scale(segmentScale, segmentScale);
+    context.drawImage(layer, -sourceStart.x, -sourceStart.y);
+    context.restore();
+  }
+
+  private sourcePoint(texture: TextureLayers, x: number, y: number): Point {
+    return { x: texture.width * x, y: texture.height * y };
+  }
+
+  private scaleFrom(origin: Point, point: Point, factor: number): Point {
+    return {
+      x: origin.x + (point.x - origin.x) * factor,
+      y: origin.y + (point.y - origin.y) * factor,
+    };
   }
 
   private drawSleeve(
