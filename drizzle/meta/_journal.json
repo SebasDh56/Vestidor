@@ -15,6 +15,20 @@
       "when": 1786146068927,
       "tag": "0001_update_killa_garment",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1786337343145,
+      "tag": "0002_cynical_zarek",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1786855501832,
+      "tag": "0003_violet_dormammu",
+      "breakpoints": true
     }
   ]
 }

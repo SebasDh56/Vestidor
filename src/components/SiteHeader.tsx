@@ -1,25 +1,23 @@
 import Link from "next/link";
+import { BrandLogo } from "@/src/components/BrandLogo";
 
 export function SiteHeader({ overlay = false }: { overlay?: boolean }) {
   return (
     <header className={`site-header ${overlay ? "site-header--overlay" : ""}`}>
-      <Link className="brand" href="/" aria-label="Raíz, inicio">
-        <span className="brand-mark">R</span>
-        <span>RAÍZ</span>
-      </Link>
+      <BrandLogo />
       <nav className="desktop-nav" aria-label="Navegación principal">
         <Link href="/">Inicio</Link>
-        <Link href="/catalogo">Colección</Link>
-        <Link href="/#origen">Nuestro origen</Link>
-        <Link className="nav-tryon" href="/probador">Probador IA</Link>
+        <Link href="/catalogo">Piezas únicas</Link>
+        <Link href="/#origen">Nuestra raíz</Link>
+        <Link className="nav-tryon" href="/probador">Vista orientativa</Link>
       </nav>
       <details className="mobile-menu">
         <summary aria-label="Abrir menú"><span /><span /></summary>
         <nav aria-label="Navegación móvil">
           <Link href="/">Inicio</Link>
-          <Link href="/catalogo">Colección</Link>
-          <Link href="/#origen">Nuestro origen</Link>
-          <Link href="/probador">Probador IA</Link>
+          <Link href="/catalogo">Piezas únicas</Link>
+          <Link href="/#origen">Nuestra raíz</Link>
+          <Link href="/probador">Vista orientativa</Link>
         </nav>
       </details>
     </header>

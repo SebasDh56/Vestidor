@@ -1,4 +1,4 @@
-# Raíz — catálogo artesanal con probador virtual
+# KILLAÉ — elegancia de raíz con probador virtual
 
 Prototipo web responsive para exhibir una colección limitada de chaquetas y abrigos, administrarla sin funciones de stock y probar las prendas mediante cámara con seguimiento corporal local.
 

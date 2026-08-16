@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { BrandLogo } from "@/src/components/BrandLogo";
 import { BodyTrackingEngine } from "@/src/engines/BodyTrackingEngine";
 import { SizeRecommendationEngine } from "@/src/engines/SizeRecommendationEngine";
 import { VirtualTryOnEngine } from "@/src/engines/VirtualTryOnEngine";
@@ -82,7 +83,7 @@ export function CameraTryOn({
       const activeId = stream.getVideoTracks()[0]?.getSettings().deviceId ?? "";
       setDeviceId(activeId);
       setCameraState("loading-model");
-      setStatusMessage("Preparando IA en tu dispositivo…");
+      setStatusMessage("Preparando seguimiento corporal…");
       await trackingEngine.initialize();
       setCameraState("ready");
       setStatusMessage("Colócate frente a la cámara");
@@ -125,10 +126,10 @@ export function CameraTryOn({
           canvas.height = video.videoHeight;
         }
 
-        if (now - lastDetectionRef.current > 66) {
+        if (now - lastDetectionRef.current > 60) {
           const detected = trackingEngine.detect(video, now);
           lastDetectionRef.current = now;
-          if (detected) landmarksRef.current = detected;
+          landmarksRef.current = detected;
 
           const meter = frameCounterRef.current;
           if (!meter.startedAt) meter.startedAt = now;
@@ -146,11 +147,20 @@ export function CameraTryOn({
           const shouldersVisible =
             (landmarks[11]?.visibility ?? 0) > 0.55 &&
             (landmarks[12]?.visibility ?? 0) > 0.55;
+          const visibleHips = [23, 24].filter(
+            (index) => (landmarks[index]?.visibility ?? 0) > 0.42,
+          ).length;
+          const armsVisible = [13, 14, 15, 16].filter(
+            (index) => (landmarks[index]?.visibility ?? 0) > 0.42,
+          ).length >= 3;
           const shoulderSpan = Math.abs((landmarks[11]?.x ?? 0) - (landmarks[12]?.x ?? 0));
-          if (!shouldersVisible) setStatusMessage("Necesitamos ver tus hombros");
+          if (!shouldersVisible) setStatusMessage("Deja visibles ambos hombros");
+          else if (visibleHips === 0) setStatusMessage("Aléjate hasta mostrar la cadera");
+          else if (visibleHips === 1) setStatusMessage("Gira suavemente hacia el frente");
           else if (shoulderSpan < 0.14) setStatusMessage("Acércate un poco");
           else if (shoulderSpan > 0.55) setStatusMessage("Aléjate un poco");
-          else setStatusMessage("Seguimiento activo");
+          else if (!armsVisible) setStatusMessage("Separa ligeramente los brazos");
+          else setStatusMessage("Ajuste corporal estable");
 
           if (now - lastRecommendationRef.current > 900) {
             const next = recommendationEngine.recommend(landmarks, heightCm, garment);
@@ -208,7 +218,7 @@ export function CameraTryOn({
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = url;
-      anchor.download = `prueba-${garment.slug}.jpg`;
+      anchor.download = `killae-${garment.slug}.jpg`;
       anchor.click();
       URL.revokeObjectURL(url);
     }, "image/jpeg", 0.92);
@@ -217,8 +227,8 @@ export function CameraTryOn({
   return (
     <main className="tryon-page">
       <header className="tryon-header">
-        <Link className="brand brand--dark" href="/"><span className="brand-mark">R</span><span>RAÍZ</span></Link>
-        <div><span className="live-dot" /> {cameraState === "ready" ? "Procesamiento local" : "Probador virtual"}</div>
+        <BrandLogo compact />
+        <div><span className="live-dot" /> {cameraState === "ready" ? "Seguimiento corporal" : "Vista orientativa"}</div>
         <Link href="/catalogo">Cerrar</Link>
       </header>
 
@@ -234,11 +244,11 @@ export function CameraTryOn({
           {cameraState !== "ready" && (
             <div className="camera-empty">
               <span className="camera-frame" />
-              <p className="eyebrow">Vista privada</p>
-              <h1>Tu cuerpo.<br />Tu forma de vestir.</h1>
-              <p>La cámara se procesa en este dispositivo. No guardamos ni enviamos tu video.</p>
+              <p className="eyebrow">VISTA PRIVADA KILLAÉ</p>
+              <h1>Su proporción.<br />Sobre tu silueta.</h1>
+              <p>Esta herramienta orienta largo y volumen; no intenta reemplazar la fotografía real. La imagen se procesa en tu dispositivo. Colócate de frente y deja visibles hombros, brazos y cadera.</p>
               <button className="button button--light" onClick={() => void openCamera()} disabled={cameraState === "requesting" || cameraState === "loading-model"}>
-                {cameraState === "requesting" ? "Solicitando permiso…" : cameraState === "loading-model" ? "Preparando IA…" : "Activar cámara"}
+                {cameraState === "requesting" ? "Solicitando permiso…" : cameraState === "loading-model" ? "Preparando AR…" : "Activar cámara"}
               </button>
               {error && <p className="camera-error">{error}</p>}
             </div>
@@ -255,7 +265,7 @@ export function CameraTryOn({
 
         <aside className="tryon-panel">
           <div className="tryon-panel-heading">
-            <p className="eyebrow">Ajuste en tiempo real</p>
+            <p className="eyebrow">Pieza seleccionada · {garment.pieceCode}</p>
             <h2>{garment.name}</h2>
             <p>{garment.color} · {garment.material}</p>
           </div>
@@ -285,6 +295,11 @@ export function CameraTryOn({
             <small>La talla modifica hombros, largo y mangas de forma independiente.</small>
           </fieldset>
 
+          <div className="camera-piece-color">
+            <span style={{ backgroundColor: garment.overlayColor }} />
+            <div><strong>{garment.color}</strong><small>Color fijo de esta pieza. No generamos variantes inexistentes.</small></div>
+          </div>
+
           <div className="tryon-products">
             <p>CAMBIAR PRENDA</p>
             <div>
@@ -296,7 +311,7 @@ export function CameraTryOn({
             </div>
           </div>
 
-          <p className="tryon-disclaimer">La recomendación es orientativa y no sustituye una prueba física ni una medición profesional.</p>
+          <p className="tryon-disclaimer">KILLAÉ usa puntos de hombros, torso, codos y muñecas para orientar proporción. La forma es aproximada y no sustituye el video, las medidas ni una prueba física.</p>
         </aside>
       </section>
     </main>

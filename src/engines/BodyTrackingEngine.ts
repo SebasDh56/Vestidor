@@ -5,7 +5,7 @@ const VISION_BUNDLE_URL =
 const VISION_WASM_URL =
   "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm";
 const POSE_MODEL_URL =
-  "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task";
+  "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/1/pose_landmarker_full.task";
 
 type PoseResult = { landmarks?: Array<Array<NormalizedLandmark>> };
 
@@ -29,7 +29,7 @@ type VisionModule = {
 export class BodyTrackingEngine {
   private landmarker: PoseLandmarkerLike | null = null;
   private smoothed: NormalizedLandmark[] | null = null;
-  private readonly smoothing = 0.42;
+  private missingFrames = 0;
 
   async initialize(): Promise<void> {
     if (this.landmarker) return;
@@ -68,7 +68,13 @@ export class BodyTrackingEngine {
     }
 
     const landmarks = this.landmarker.detectForVideo(video, timestamp).landmarks?.[0];
-    if (!landmarks) return null;
+    if (!landmarks) {
+      this.missingFrames += 1;
+      if (this.missingFrames > 4) this.smoothed = null;
+      return this.smoothed;
+    }
+
+    this.missingFrames = 0;
 
     if (!this.smoothed) {
       this.smoothed = landmarks.map((point) => ({ ...point }));
@@ -77,13 +83,24 @@ export class BodyTrackingEngine {
 
     this.smoothed = landmarks.map((point, index) => {
       const previous = this.smoothed?.[index] ?? point;
+      const visibility = point.visibility ?? 0;
+      const movement = Math.hypot(point.x - previous.x, point.y - previous.y);
+      const response = visibility > 0.78
+        ? Math.min(0.64, Math.max(0.2, 0.2 + movement * 7.5))
+        : visibility > 0.48
+          ? 0.16
+          : 0.08;
+      const clampDelta = (next: number, before: number) => {
+        const delta = Math.max(-0.09, Math.min(0.09, next - before));
+        return before + delta * response;
+      };
       return {
-        x: previous.x + (point.x - previous.x) * this.smoothing,
-        y: previous.y + (point.y - previous.y) * this.smoothing,
-        z: previous.z + (point.z - previous.z) * this.smoothing,
+        x: clampDelta(point.x, previous.x),
+        y: clampDelta(point.y, previous.y),
+        z: clampDelta(point.z, previous.z),
         visibility:
           previous.visibility +
-          ((point.visibility ?? 0) - previous.visibility) * this.smoothing,
+          (visibility - previous.visibility) * 0.32,
       };
     });
 
@@ -94,5 +111,6 @@ export class BodyTrackingEngine {
     this.landmarker?.close();
     this.landmarker = null;
     this.smoothed = null;
+    this.missingFrames = 0;
   }
 }

@@ -1,5 +1,6 @@
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { ADMIN_EMAIL } from "@/src/config/brand";
 
 export type ChatGPTUser = {
   userId: string;
@@ -17,12 +18,44 @@ const PERCENT_ENCODED_UTF8 = "percent-encoded-utf-8";
 const SIGN_IN_PATH = "/signin-with-chatgpt";
 const SIGN_OUT_PATH = "/signout-with-chatgpt";
 const CALLBACK_PATH = "/callback";
+export const LOCAL_ADMIN_COOKIE = "killae_local_admin";
+
+function isLocalHost(host: string | null): boolean {
+  if (!host) return false;
+  const normalized = host.split(",")[0].trim().toLowerCase();
+  return (
+    normalized === "localhost" ||
+    normalized.startsWith("localhost:") ||
+    normalized === "127.0.0.1" ||
+    normalized.startsWith("127.0.0.1:") ||
+    normalized === "[::1]" ||
+    normalized.startsWith("[::1]:")
+  );
+}
+
+export async function isLocalDevelopmentRequest(): Promise<boolean> {
+  const requestHeaders = await headers();
+  return isLocalHost(
+    requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host"),
+  );
+}
 
 export async function getChatGPTUser(): Promise<ChatGPTUser | null> {
   const requestHeaders = await headers();
   const userId = requestHeaders.get(USER_ID_HEADER);
   const email = requestHeaders.get(USER_EMAIL_HEADER);
-  if (!userId || !email) return null;
+  if (!userId || !email) {
+    if (!(await isLocalDevelopmentRequest())) return null;
+    const cookieStore = await cookies();
+    if (cookieStore.get(LOCAL_ADMIN_COOKIE)?.value !== ADMIN_EMAIL) return null;
+
+    return {
+      userId: `local:${ADMIN_EMAIL}`,
+      displayName: "Administración local",
+      email: ADMIN_EMAIL,
+      fullName: "Administración local",
+    };
+  }
 
   const encodedFullName = requestHeaders.get(USER_FULL_NAME_HEADER);
   const fullName =

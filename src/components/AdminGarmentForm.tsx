@@ -15,10 +15,10 @@ export function AdminGarmentForm() {
     try {
       const response = await fetch("/api/garments", { method: "POST", body: formData });
       const payload = (await response.json()) as { error?: string };
-      if (!response.ok) throw new Error(payload.error ?? "No se pudo guardar la prenda.");
+      if (!response.ok) throw new Error(payload.error ?? "No se pudo guardar la pieza.");
       formRef.current?.reset();
       setState("success");
-      setMessage("Prenda publicada en el catálogo.");
+      setMessage("Pieza publicada en el catálogo.");
       router.refresh();
     } catch (error) {
       setState("error");
@@ -29,23 +29,21 @@ export function AdminGarmentForm() {
   return (
     <form ref={formRef} action={submit} className="admin-form">
       <div className="field-grid">
-        <label>Nombre<input name="name" required placeholder="Ej. Chaqueta Killa" /></label>
-        <label>Categoría<input name="category" required placeholder="Chaquetas" /></label>
-        <label>Material<input name="material" required placeholder="Paño artesanal" /></label>
-        <label>Color<input name="color" required placeholder="Marfil natural" /></label>
+        <label>Código único<input name="pieceCode" required placeholder="Ej. KAE-A05" /></label>
+        <label>Nombre de la pieza<input name="name" required placeholder="Ej. Tierra Serena" /></label>
+        <label>Categoría<input name="category" defaultValue="Abrigo Andino · Pieza única" required /></label>
+        <label>Color real<input name="color" required placeholder="Camel con acentos turquesa" /></label>
+        <label>Material<input name="material" required placeholder="Paño con aplicación textil" /></label>
+        <label>Estado<select name="availability" defaultValue="available"><option value="available">Disponible</option><option value="reserved">Reservada</option><option value="sold">Vendida</option></select></label>
+        <label>Unidades<input name="units" type="number" min="1" max="20" defaultValue="1" required /></label>
       </div>
-      <label>Descripción<textarea name="description" required rows={4} placeholder="Describe el corte, textura y detalles artesanales." /></label>
+      <label>Descripción<textarea name="description" required rows={4} placeholder="Describe el corte y los detalles reales de esta pieza." /></label>
       <div className="field-grid colors-grid">
-        <label>Color virtual<input name="overlayColor" type="color" defaultValue="#c6b39a" /></label>
-        <label>Acento virtual<input name="overlayAccent" type="color" defaultValue="#a6462e" /></label>
+        <label>Color de vista AR<input name="overlayColor" type="color" defaultValue="#c6b39a" /></label>
+        <label>Acento de vista AR<input name="overlayAccent" type="color" defaultValue="#a6462e" /></label>
       </div>
-      <label className="file-field">
-        Imagen de la prenda <span>JPG, PNG o WebP · máximo 5 MB</span>
-        <input name="image" type="file" accept="image/png,image/jpeg,image/webp" />
-      </label>
-      <button className="button button--dark" disabled={state === "saving"}>
-        {state === "saving" ? "Guardando…" : "Publicar prenda"}
-      </button>
+      <label className="file-field">Imagen principal <span>JPG, PNG o WebP · máximo 5 MB</span><input name="image" type="file" accept="image/png,image/jpeg,image/webp" /></label>
+      <button className="button button--dark" disabled={state === "saving"}>{state === "saving" ? "Guardando…" : "Publicar pieza única"}</button>
       {message && <p className={`form-message form-message--${state}`}>{message}</p>}
     </form>
   );

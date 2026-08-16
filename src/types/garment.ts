@@ -1,6 +1,7 @@
 export const GARMENT_SIZES = ["S", "M", "L", "XL"] as const;
 
 export type GarmentSize = (typeof GARMENT_SIZES)[number];
+export type GarmentAvailability = "available" | "reserved" | "sold";
 
 export type SizeChartEntry = {
   size: GarmentSize;
@@ -13,11 +14,14 @@ export type SizeChartEntry = {
 export type Garment = {
   id: number;
   slug: string;
+  pieceCode: string;
   name: string;
   category: string;
   description: string;
   material: string;
   color: string;
+  availability: GarmentAvailability;
+  units: number;
   imageUrl: string;
   imageKey: string | null;
   imageFocus: "left" | "center" | "right";
