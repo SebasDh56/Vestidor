@@ -49,10 +49,12 @@ test("admin manages unique-piece availability with a signed Cloudflare session",
 });
 
 test("Cloudflare deploy uses D1 media without requiring R2", async () => {
-  const [wrangler, media, adminForm] = await Promise.all([
+  const [wrangler, media, adminForm, deployScript, packageJson] = await Promise.all([
     readFile(new URL("../wrangler.jsonc", import.meta.url), "utf8"),
     readFile(new URL("../src/services/media.ts", import.meta.url), "utf8"),
     readFile(new URL("../src/components/AdminGarmentForm.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../scripts/deploy-cloudflare.mjs", import.meta.url), "utf8"),
+    readFile(new URL("../package.json", import.meta.url), "utf8"),
   ]);
 
   assert.match(wrangler, /"name": "vestidor"/);
@@ -62,4 +64,7 @@ test("Cloudflare deploy uses D1 media without requiring R2", async () => {
   assert.match(media, /1_400_000/);
   assert.match(adminForm, /optimizeImage/);
   assert.match(adminForm, /image\/webp/);
+  assert.match(deployScript, /d1", "list", "--json"/);
+  assert.match(deployScript, /database_id/);
+  assert.match(packageJson, /node scripts\/deploy-cloudflare\.mjs/);
 });

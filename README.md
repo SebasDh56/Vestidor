@@ -44,6 +44,8 @@ La aplicación ya no depende de GPT Sites. `wrangler.jsonc` contiene la configur
 
 `keep_vars` está habilitado en `wrangler.jsonc`, por lo que los siguientes despliegues conservan el secreto configurado en el panel.
 
+El comando `deploy:worker` consulta las bases D1 de la cuenta antes de publicar. Si `vestidor-db` ya existe por un intento anterior, recupera su identificador y la reutiliza; si no existe, permite que Wrangler la cree. Esto evita el error `A database with that name already exists` sin guardar identificadores de cuenta en el repositorio.
+
 Después de esa configuración inicial, cada cambio publicado en `main` se despliega automáticamente:
 
 ```bash
