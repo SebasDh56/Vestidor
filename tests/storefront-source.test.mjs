@@ -47,3 +47,19 @@ test("admin manages unique-piece availability with a signed Cloudflare session",
   assert.match(catalog, /ADMIN_EMAIL/);
   assert.match(brand, /quimbiulcoerika@gmail\.com/);
 });
+
+test("Cloudflare deploy uses D1 media without requiring R2", async () => {
+  const [wrangler, media, adminForm] = await Promise.all([
+    readFile(new URL("../wrangler.jsonc", import.meta.url), "utf8"),
+    readFile(new URL("../src/services/media.ts", import.meta.url), "utf8"),
+    readFile(new URL("../src/components/AdminGarmentForm.tsx", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(wrangler, /"name": "vestidor"/);
+  assert.match(wrangler, /"binding": "DB"/);
+  assert.doesNotMatch(wrangler, /r2_buckets|GARMENT_IMAGES/);
+  assert.match(media, /garment_media/);
+  assert.match(media, /1_400_000/);
+  assert.match(adminForm, /optimizeImage/);
+  assert.match(adminForm, /image\/webp/);
+});

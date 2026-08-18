@@ -5,8 +5,7 @@ E-commerce editorial de piezas andinas únicas, con catálogo, solicitudes por W
 ## Tecnología
 
 - Vinext, React y Vite sobre Cloudflare Workers.
-- Cloudflare D1 para catálogo y solicitudes.
-- Cloudflare R2 para fotografías cargadas desde el panel.
+- Cloudflare D1 para catálogo, solicitudes y fotografías optimizadas del panel.
 - MediaPipe en el navegador para el seguimiento corporal del probador.
 - Sin API de OpenAI, generación pagada ni Cloudflare Images durante el uso del sitio.
 
@@ -32,7 +31,7 @@ npm test
 
 ## Primer despliegue en Cloudflare
 
-La aplicación ya no depende de GPT Sites. `wrangler.jsonc` contiene la configuración de Worker, D1 y R2. En el primer despliegue Cloudflare puede aprovisionar y enlazar los recursos declarados sin identificadores.
+La aplicación ya no depende de GPT Sites. `wrangler.jsonc` contiene la configuración del Worker y D1. En el primer despliegue Cloudflare puede aprovisionar y enlazar la base de datos sin identificadores. R2 no es necesario, por lo que el despliegue funciona aunque ese servicio no esté habilitado en la cuenta.
 
 1. Sube el repositorio a GitHub.
 2. En Cloudflare abre **Workers & Pages > Create > Import a repository**.
@@ -80,11 +79,11 @@ npm run db:migrate:remote
 - Contraseña: el secreto `ADMIN_PASSWORD` definido por el propietario.
 - La sesión usa una cookie `HttpOnly`, `SameSite=Strict` y firmada con HMAC.
 
-Desde el panel se pueden publicar piezas, cargar imágenes, cambiar disponibilidad y revisar solicitudes. Los pagos, facturación y envíos continúan fuera del sitio en esta etapa.
+Desde el panel se pueden publicar piezas, cargar imágenes, cambiar disponibilidad y revisar solicitudes. Las fotografías se reducen a WebP en el navegador y se limitan a 1.4 MB antes de guardarse en D1. Los pagos, facturación y envíos continúan fuera del sitio en esta etapa.
 
 ## Costos y privacidad
 
-La web no consume tokens de ChatGPT ni de la API de OpenAI. El video del probador no se sube al servidor: MediaPipe procesa los fotogramas en el dispositivo. Cloudflare solo contabiliza el uso normal de Workers, D1, R2 y transferencia de archivos conforme al plan de la cuenta.
+La web no consume tokens de ChatGPT ni de la API de OpenAI. El video del probador no se sube al servidor: MediaPipe procesa los fotogramas en el dispositivo. Cloudflare solo contabiliza el uso normal de Workers, D1 y transferencia de archivos conforme al plan de la cuenta.
 
 ## Estructura principal
 
@@ -92,7 +91,7 @@ La web no consume tokens de ChatGPT ni de la API de OpenAI. El video del probado
 app/                    páginas, autenticación y rutas API
 src/components/         tienda, administración y cámara
 src/engines/            tracking, talla y render de prenda
-src/services/           catálogo, D1, R2 y solicitudes
+src/services/           catálogo, medios D1 y solicitudes
 drizzle/                migraciones SQL
 public/images/          fotografías editoriales y de catálogo
 worker/                 entrada del Cloudflare Worker

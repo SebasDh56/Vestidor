@@ -26,20 +26,20 @@ NormalizedLandmark[]
 Storefront público ── GET/listGarments ── D1 garments
                                             ↑
 Admin autenticado ── POST /api/garments ────┤
-                    └─ imagen ───────────── R2 GARMENT_IMAGES
+                    └─ imagen WebP ───────── D1 garment_media
 ```
 
 Cuando D1 todavía no está disponible, el storefront conserva el catálogo inicial incluido en el proyecto. En despliegue, la primera petición crea las tablas de forma idempotente y carga las prendas iniciales; la migración Drizzle deja el esquema versionado.
 
 ## Autorización
 
-La autenticación pertenece a la plataforma. El servidor recibe la identidad autenticada y registra como administrador al primer usuario que abre el panel en una base nueva. Toda escritura vuelve a comprobar esa membresía en el servidor; ocultar botones en el cliente no se usa como control de acceso.
+El administrador inicia sesión con el correo autorizado y el secreto `ADMIN_PASSWORD` configurado en Cloudflare. El servidor firma una cookie `HttpOnly` con HMAC y vuelve a comprobar la sesión y la membresía antes de cada escritura.
 
 ## Decisiones del MVP
 
 - MediaPipe Pose Landmarker: 33 landmarks, ejecución web local y coordenadas normalizadas/3D.
 - Canvas 2D deformable: permite validar seguimiento y comparación de tallas antes de invertir en rigging GLB.
-- D1 + R2: metadatos relacionales separados de archivos grandes.
+- D1 único: elimina la activación obligatoria de R2 para el MVP. Las fotos se comprimen a WebP y cada fila queda por debajo de 1.4 MB.
 - Sin e-commerce: no existen entidades de stock, pedido, carrito o pago.
 
 ## Próximas fases

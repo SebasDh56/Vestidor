@@ -1,4 +1,4 @@
-import { getRuntimeEnv } from "@/src/services/catalog";
+import { getGarmentImage } from "@/src/services/media";
 
 export async function GET(
   _request: Request,
@@ -10,12 +10,15 @@ export async function GET(
     return new Response("No encontrado", { status: 404 });
   }
 
-  const object = await getRuntimeEnv().GARMENT_IMAGES?.get(objectKey);
-  if (!object) return new Response("No encontrado", { status: 404 });
+  const image = await getGarmentImage(objectKey);
+  if (!image) return new Response("No encontrado", { status: 404 });
 
-  const headers = new Headers();
-  object.writeHttpMetadata(headers);
-  headers.set("etag", object.httpEtag);
+  const headers = new Headers({
+    "content-type": image.contentType,
+    "content-length": String(image.byteSize),
+  });
+  headers.set("etag", image.etag);
   headers.set("cache-control", "public, max-age=31536000, immutable");
-  return new Response(object.body, { headers });
+  headers.set("x-content-type-options", "nosniff");
+  return new Response(image.body, { headers });
 }

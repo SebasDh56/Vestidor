@@ -8,7 +8,6 @@ import type { Garment, GarmentAvailability } from "@/src/types/garment";
 
 type RuntimeEnv = {
   DB?: D1Database;
-  GARMENT_IMAGES?: R2Bucket;
 };
 
 type GarmentRow = {
@@ -107,6 +106,14 @@ export async function ensurePrototypeSchema(db: D1Database): Promise<void> {
       city TEXT NOT NULL DEFAULT '',
       notes TEXT NOT NULL DEFAULT '',
       status TEXT NOT NULL DEFAULT 'new',
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS garment_media (
+      key TEXT PRIMARY KEY,
+      content_type TEXT NOT NULL,
+      content BLOB NOT NULL,
+      byte_size INTEGER NOT NULL,
+      etag TEXT NOT NULL,
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     )`),
     db.prepare("CREATE UNIQUE INDEX IF NOT EXISTS idx_garments_slug ON garments(slug)"),

@@ -2,10 +2,10 @@ import { getAdminUser } from "@/app/admin-auth";
 import {
   createGarment,
   ensureAdminMembership,
-  getRuntimeEnv,
   listGarments,
   updateGarmentAvailability,
 } from "@/src/services/catalog";
+import { MAX_GARMENT_IMAGE_BYTES, storeGarmentImage } from "@/src/services/media";
 import type { GarmentAvailability } from "@/src/types/garment";
 
 const slugify = (value: string) => value.normalize("NFD")
@@ -51,15 +51,12 @@ export async function POST(request: Request) {
     let imageKey: string | null = null;
     let imageUrl = "/images/catalog/abrigo-andino-a01-gris-geometrico-v2.png";
     if (image instanceof File && image.size > 0) {
-      if (!image.type.startsWith("image/") || image.size > 5 * 1024 * 1024) {
-        return Response.json({ error: "La imagen debe ser JPG, PNG o WebP y pesar menos de 5 MB." }, { status: 400 });
+      if (!image.type.startsWith("image/") || image.size > MAX_GARMENT_IMAGE_BYTES) {
+        return Response.json({ error: "La imagen debe ser JPG, PNG o WebP y pesar menos de 1.4 MB." }, { status: 400 });
       }
-      const bucket = getRuntimeEnv().GARMENT_IMAGES;
-      if (!bucket) return Response.json({ error: "El almacenamiento de imágenes no está disponible." }, { status: 503 });
-      const extension = image.name.split(".").pop()?.toLowerCase() ?? "jpg";
-      imageKey = `garments/${crypto.randomUUID()}.${extension}`;
-      await bucket.put(imageKey, await image.arrayBuffer(), { httpMetadata: { contentType: image.type } });
-      imageUrl = `/api/media/${encodeURIComponent(imageKey)}`;
+      const storedImage = await storeGarmentImage(image);
+      imageKey = storedImage.key;
+      imageUrl = storedImage.url;
     }
 
     const garment = await createGarment({

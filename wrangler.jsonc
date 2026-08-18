@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "killae-storefront",
+  "name": "vestidor",
   "main": "./worker/index.ts",
   "compatibility_date": "2026-08-16",
   "compatibility_flags": ["nodejs_compat"],
@@ -9,11 +9,6 @@
     {
       "binding": "DB",
       "migrations_dir": "drizzle"
-    }
-  ],
-  "r2_buckets": [
-    {
-      "binding": "GARMENT_IMAGES"
     }
   ]
 }

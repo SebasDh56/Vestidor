@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { blob, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const admins = sqliteTable("admins", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -42,5 +42,14 @@ export const customerRequests = sqliteTable("customer_requests", {
   city: text("city").notNull().default(""),
   notes: text("notes").notNull().default(""),
   status: text("status").notNull().default("new"),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const garmentMedia = sqliteTable("garment_media", {
+  key: text("key").primaryKey(),
+  contentType: text("content_type").notNull(),
+  content: blob("content").notNull(),
+  byteSize: integer("byte_size").notNull(),
+  etag: text("etag").notNull(),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
