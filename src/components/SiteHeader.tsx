@@ -7,7 +7,7 @@ export function SiteHeader({ overlay = false }: { overlay?: boolean }) {
       <BrandLogo />
       <nav className="desktop-nav" aria-label="Navegación principal">
         <Link href="/">Inicio</Link>
-        <Link href="/catalogo">Piezas únicas</Link>
+        <Link href="/catalogo">Combinaciones</Link>
         <Link href="/#origen">Nuestra raíz</Link>
         <Link className="nav-tryon" href="/probador">Vista orientativa</Link>
       </nav>
@@ -15,7 +15,7 @@ export function SiteHeader({ overlay = false }: { overlay?: boolean }) {
         <summary aria-label="Abrir menú"><span /><span /></summary>
         <nav aria-label="Navegación móvil">
           <Link href="/">Inicio</Link>
-          <Link href="/catalogo">Piezas únicas</Link>
+          <Link href="/catalogo">Combinaciones</Link>
           <Link href="/#origen">Nuestra raíz</Link>
           <Link href="/probador">Vista orientativa</Link>
         </nav>

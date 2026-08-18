@@ -2,14 +2,32 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-test("storefront presents the unique-piece business model", async () => {
+test("storefront presents the Abrigo Andino combinations by size", async () => {
   const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
   assert.match(source, /KILLAÉ · ELEGANCIA DE RAÍZ/);
-  assert.match(source, /Ninguna vuelve/);
-  assert.match(source, /Cuatro piezas\. Ninguna repetida/);
-  assert.match(source, /Pide la evidencia real/);
+  assert.match(source, /Tu talla\./);
+  assert.match(source, /Tu combinación\./);
+  assert.match(source, /CombinationCollection/);
+  assert.match(source, /Empieza por tu talla/);
   assert.match(source, /Consultar por WhatsApp/);
-  assert.doesNotMatch(source, /Elige tu color|Cuatro formas de ser|codex-preview|SkeletonPreview/);
+  assert.doesNotMatch(source, /Cuatro piezas\. Ninguna repetida|codex-preview|SkeletonPreview/);
+});
+
+test("combination catalog maps girls, S and M without inventing size L", async () => {
+  const [data, component] = await Promise.all([
+    readFile(new URL("../src/data/combinations.ts", import.meta.url), "utf8"),
+    readFile(new URL("../src/components/CombinationCollection.tsx", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(data, /Combinaciones 01–03/);
+  assert.match(data, /Combinaciones 04–06/);
+  assert.match(data, /Combinaciones 07–10/);
+  assert.match(data, /sizeLabel: "Niñas"/);
+  assert.match(data, /sizeLabel: "Talla S"/);
+  assert.match(data, /sizeLabel: "Talla M"/);
+  assert.doesNotMatch(data, /sizeLabel: "Talla L"/);
+  assert.match(component, /PRÓXIMA TALLA/);
+  assert.match(component, /wa\.me/);
 });
 
 test("try-on stays private and does not invent product colors", async () => {
