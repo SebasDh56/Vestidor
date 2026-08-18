@@ -1,4 +1,4 @@
-import { getChatGPTUser } from "@/app/chatgpt-auth";
+import { getAdminUser } from "@/app/admin-auth";
 import {
   createGarment,
   ensureAdminMembership,
@@ -13,7 +13,7 @@ const slugify = (value: string) => value.normalize("NFD")
   .toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 async function requireAdmin() {
-  const user = await getChatGPTUser();
+  const user = await getAdminUser();
   if (!user) return { error: Response.json({ error: "Inicia sesión." }, { status: 401 }) };
   const membership = await ensureAdminMembership(user);
   if (!membership.allowed) return { error: Response.json({ error: "Acceso solo para administración." }, { status: 403 }) };

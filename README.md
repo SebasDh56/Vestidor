@@ -1,94 +1,102 @@
-# KILLAÉ — elegancia de raíz con probador virtual
+# KILLAÉ — elegancia de raíz
 
-Prototipo web responsive para exhibir una colección limitada de chaquetas y abrigos, administrarla sin funciones de stock y probar las prendas mediante cámara con seguimiento corporal local.
+E-commerce editorial de piezas andinas únicas, con catálogo, solicitudes por WhatsApp, panel administrativo y probador AR procesado localmente en el navegador.
 
-## Qué incluye
+## Tecnología
 
-- Portada editorial y catálogo responsive basado únicamente en las prendas de referencia.
-- Detalle de cada prenda con color, material, tallas y acceso directo al probador.
-- Cámara frontal, selector de dispositivo y manejo de permisos/errores.
-- Pose Landmarker de MediaPipe ejecutado en el navegador.
-- Seguimiento estabilizado de hombros, codos, muñecas y cadera.
-- Render de prenda deformable: torso, mangas, ancho y largo reaccionan al cuerpo y a la talla.
-- Recomendación orientativa S/M/L/XL basada en la tabla de cada prenda.
-- Vista debug de landmarks, contador de FPS y captura local.
-- Panel de administración autenticado para publicar información e imágenes.
-- D1 para datos estructurados y R2 para imágenes subidas.
+- Vinext, React y Vite sobre Cloudflare Workers.
+- Cloudflare D1 para catálogo y solicitudes.
+- Cloudflare R2 para fotografías cargadas desde el panel.
+- MediaPipe en el navegador para el seguimiento corporal del probador.
+- Sin API de OpenAI, generación pagada ni Cloudflare Images durante el uso del sitio.
 
-No incluye inventario, carrito, pagos, pedidos ni precisión biométrica.
+## Desarrollo local
 
-## Ejecución local
-
-Requiere Node.js 22 o superior.
+Requiere Node.js 22.13 o superior.
 
 ```bash
 npm install
+Copy-Item .dev.vars.example .dev.vars
 npm run dev
 ```
 
-Abrir la URL local indicada por el servidor. El acceso a cámara exige `localhost` o HTTPS.
+Cambia `ADMIN_PASSWORD` dentro de `.dev.vars` antes de abrir `/admin`. Ese archivo está ignorado por Git y nunca debe subirse al repositorio.
 
 Verificaciones:
 
 ```bash
 npm run build
-node node_modules/typescript/bin/tsc --noEmit
-node node_modules/eslint/bin/eslint.js . --ignore-pattern dist --ignore-pattern .next
+npm run lint
 npm test
+```
+
+## Primer despliegue en Cloudflare
+
+La aplicación ya no depende de GPT Sites. `wrangler.jsonc` contiene la configuración de Worker, D1 y R2. En el primer despliegue Cloudflare puede aprovisionar y enlazar los recursos declarados sin identificadores.
+
+1. Sube el repositorio a GitHub.
+2. En Cloudflare abre **Workers & Pages > Create > Import a repository**.
+3. Conecta el repositorio y selecciona `main` como rama de producción.
+4. Usa `npm run build` como **Build command**.
+5. Usa `npm run deploy:worker` como **Deploy command**.
+6. Ejecuta el primer despliegue.
+7. En el Worker abre **Settings > Variables and Secrets**, crea `ADMIN_PASSWORD` como **Secret** y usa una contraseña de al menos 12 caracteres.
+8. Opcionalmente enlaza el dominio propio desde **Settings > Domains & Routes**.
+
+`keep_vars` está habilitado en `wrangler.jsonc`, por lo que los siguientes despliegues conservan el secreto configurado en el panel.
+
+Después de esa configuración inicial, cada cambio publicado en `main` se despliega automáticamente:
+
+```bash
+git add .
+git commit -m "describe el cambio"
+git push origin main
+```
+
+Un `git commit` solamente local no despliega; Cloudflare recibe el cambio cuando haces `git push`.
+
+## Despliegue manual opcional
+
+Si prefieres desplegar desde tu equipo:
+
+```bash
+npx wrangler login
+npm run deploy
+```
+
+## Base de datos
+
+El MVP crea de forma idempotente sus tablas al recibir las primeras solicitudes. Las migraciones versionadas también se pueden aplicar manualmente:
+
+```bash
+npm run db:migrate:local
+npm run db:migrate:remote
 ```
 
 ## Administración
 
-La ruta `/admin` utiliza el inicio de sesión administrado por la plataforma. En una instalación nueva, el primer usuario autenticado queda registrado en D1 como administrador inicial; los siguientes usuarios autenticados son rechazados. El catálogo público no requiere cuenta.
+- Ruta: `/admin`
+- Correo autorizado: `quimbiulcoerika@gmail.com`
+- Contraseña: el secreto `ADMIN_PASSWORD` definido por el propietario.
+- La sesión usa una cookie `HttpOnly`, `SameSite=Strict` y firmada con HMAC.
 
-El formulario permite cargar:
+Desde el panel se pueden publicar piezas, cargar imágenes, cambiar disponibilidad y revisar solicitudes. Los pagos, facturación y envíos continúan fuera del sitio en esta etapa.
 
-- nombre, categoría y descripción;
-- material y color;
-- colores del render virtual;
-- imagen JPG, PNG o WebP de hasta 5 MB.
+## Costos y privacidad
 
-## Privacidad y cámara
-
-Los frames se procesan temporalmente en el dispositivo. No se envía ni se guarda video. La captura solo se descarga cuando la persona pulsa `Capturar`.
-
-MediaPipe y su modelo se cargan desde los endpoints públicos oficiales/CDN al activar el probador. La inferencia se limita aproximadamente a 15 FPS para equilibrar estabilidad y rendimiento; el render continúa con `requestAnimationFrame`.
-
-## Hosting en OpenAI Sites y consumo
-
-El prototipo no llama a la API de OpenAI ni a ningún modelo generativo durante la navegación, el uso de la cámara o la administración. Por tanto, usar el sitio no consume tokens. El seguimiento corporal se ejecuta localmente en el navegador con MediaPipe.
-
-Los únicos recursos persistentes del hosting son:
-
-- D1 para la información del catálogo y el administrador;
-- R2 para las imágenes cargadas desde `/admin`;
-- transferencia y ejecución normal del sitio.
-
-Para mantener bajo el consumo, las imágenes de R2 se publican con caché de un año, cada archivo se limita a 5 MB y el video de la cámara nunca se sube al servidor. La configuración de Sites se conserva en `.openai/hosting.json`; los recursos reales y sus credenciales son administrados por la plataforma.
-
-Antes de hacer pública una instalación nueva, el propietario debe entrar primero en `/admin`: esa primera identidad autenticada queda registrada como administrador inicial.
-
-## Limitaciones reales del MVP
-
-- El render es AR 2D deformable anclado a landmarks; no es aún una simulación física 3D de tela.
-- La oclusión de manos/brazos y la segmentación de persona quedan para una siguiente fase.
-- La talla es una estimación visual orientativa, no una medición clínica.
-- La fidelidad del color y el ajuste dependen de iluminación, encuadre y cámara.
-- Para producción conviene versionar localmente el modelo MediaPipe y mover inferencia a un Web Worker.
+La web no consume tokens de ChatGPT ni de la API de OpenAI. El video del probador no se sube al servidor: MediaPipe procesa los fotogramas en el dispositivo. Cloudflare solo contabiliza el uso normal de Workers, D1, R2 y transferencia de archivos conforme al plan de la cuenta.
 
 ## Estructura principal
 
 ```text
-app/                    rutas, páginas y API
-src/components/         storefront, administración y cámara
+app/                    páginas, autenticación y rutas API
+src/components/         tienda, administración y cámara
 src/engines/            tracking, talla y render de prenda
-src/services/           catálogo, D1, R2 y autorización
-src/data/               catálogo inicial
-src/types/              contratos del dominio
-db/                     esquema Drizzle
+src/services/           catálogo, D1, R2 y solicitudes
 drizzle/                migraciones SQL
-public/images/          referencias y editoriales generadas
-tests/                  render y lógica de talla
+public/images/          fotografías editoriales y de catálogo
+worker/                 entrada del Cloudflare Worker
+wrangler.jsonc          infraestructura y bindings de Cloudflare
 ```
 
-Ver [ARCHITECTURE.md](./ARCHITECTURE.md) para el flujo técnico y el roadmap.
+Consulta [ARCHITECTURE.md](./ARCHITECTURE.md) para el flujo técnico y las limitaciones reales del probador.

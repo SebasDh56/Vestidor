@@ -1,23 +1,26 @@
 import Link from "next/link";
 import { BrandLogo } from "@/src/components/BrandLogo";
 import {
-  chatGPTSignInPath,
-  chatGPTSignOutPath,
-  getChatGPTUser,
-  isLocalDevelopmentRequest,
-} from "@/app/chatgpt-auth";
+  getAdminUser,
+  isAdminAuthConfigured,
+} from "@/app/admin-auth";
 import { AdminGarmentForm } from "@/src/components/AdminGarmentForm";
 import { AdminAvailabilityControl } from "@/src/components/AdminAvailabilityControl";
-import { BRAND_NAME, WHATSAPP_NUMBER } from "@/src/config/brand";
+import { ADMIN_EMAIL, BRAND_NAME, WHATSAPP_NUMBER } from "@/src/config/brand";
 import { ensureAdminMembership, listGarments } from "@/src/services/catalog";
 import { listCustomerRequests } from "@/src/services/requests";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminPage() {
-  const isLocal = await isLocalDevelopmentRequest();
-  const user = await getChatGPTUser();
+type AdminPageProps = {
+  searchParams: Promise<{ error?: string }>;
+};
+
+export default async function AdminPage({ searchParams }: AdminPageProps) {
+  const user = await getAdminUser();
   if (!user) {
+    const { error } = await searchParams;
+    const authConfigured = isAdminAuthConfigured();
     return (
       <main className="admin-login">
         <BrandLogo compact />
@@ -25,22 +28,35 @@ export default async function AdminPage() {
           <p className="eyebrow">ACCESO RESTRINGIDO</p>
           <h1>Administración<br />de piezas únicas.</h1>
           <p>Publica nuevos abrigos, carga su imagen y controla si cada pieza está disponible, reservada o vendida.</p>
-          {isLocal ? <><form action="/api/admin/local-login" method="post"><button className="button button--dark" type="submit">Entrar al panel local</button></form><small className="admin-login-hint">Acceso de desarrollo disponible únicamente en este equipo.</small></> : <Link className="button button--dark" href={chatGPTSignInPath("/admin")}>Iniciar sesión como admin</Link>}
+          <form className="admin-login-form" action="/api/admin/login" method="post">
+            <input type="hidden" name="returnTo" value="/admin" />
+            <label>
+              Correo administrativo
+              <input name="email" type="email" defaultValue={ADMIN_EMAIL} autoComplete="username" required />
+            </label>
+            <label>
+              Contraseña
+              <input name="password" type="password" autoComplete="current-password" minLength={8} required />
+            </label>
+            {error === "credentials" && <p className="admin-login-error">Correo o contraseña incorrectos.</p>}
+            {(error === "configuration" || !authConfigured) && <p className="admin-login-error">Falta configurar el secreto ADMIN_PASSWORD en Cloudflare.</p>}
+            <button className="button button--dark" type="submit" disabled={!authConfigured}>Entrar al panel</button>
+          </form>
+          <small className="admin-login-hint">Sesión privada protegida por una cookie firmada. La contraseña nunca se guarda en el navegador.</small>
         </section>
       </main>
     );
   }
 
   const access = await ensureAdminMembership(user);
-  if (!access.allowed) return <main className="admin-denied"><h1>Acceso no autorizado</h1><p>Este panel pertenece al administrador registrado.</p><Link href={chatGPTSignOutPath("/")}>Cerrar sesión</Link></main>;
+  if (!access.allowed) return <main className="admin-denied"><h1>Acceso no autorizado</h1><p>Este panel pertenece al administrador registrado.</p><Link href="/">Volver al inicio</Link></main>;
 
   const [garments, requests] = await Promise.all([listGarments(), listCustomerRequests()]);
-  const signOutPath = user.userId.startsWith("local:") ? "/api/admin/local-logout" : chatGPTSignOutPath("/");
   const available = garments.filter((item) => item.availability === "available").length;
 
   return (
     <main className="admin-page">
-      <header className="admin-header"><BrandLogo compact /><div><span>{user.email}</span><Link href={signOutPath}>Cerrar sesión</Link></div></header>
+      <header className="admin-header"><BrandLogo compact /><div><span>{user.email}</span><form action="/api/admin/logout" method="post"><button type="submit">Cerrar sesión</button></form></div></header>
       <section className="admin-shell">
         <aside>
           <p className="eyebrow">PANEL KILLAÉ</p>

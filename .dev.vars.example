@@ -1,0 +1,3 @@
+# Copia este archivo como .dev.vars para iniciar sesión en /admin localmente.
+# En Cloudflare, crea ADMIN_PASSWORD como Secret; nunca la subas al repositorio.
+ADMIN_PASSWORD=cambia-esta-clave-local

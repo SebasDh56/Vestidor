@@ -11,7 +11,12 @@
     "start": "node node_modules/vinext/dist/cli.js start",
     "test": "npm run build && node --test tests/*.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
-    "db:generate": "drizzle-kit generate"
+    "deploy": "npm run build && wrangler deploy",
+    "deploy:worker": "wrangler deploy",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate:local": "wrangler d1 migrations apply DB --local",
+    "db:migrate:remote": "wrangler d1 migrations apply DB --remote",
+    "cf:types": "wrangler types"
   },
   "dependencies": {
     "drizzle-orm": "0.45.2",

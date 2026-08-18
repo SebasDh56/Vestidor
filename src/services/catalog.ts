@@ -2,7 +2,7 @@ import "server-only";
 
 import { env } from "cloudflare:workers";
 import { DEFAULT_GARMENTS, STANDARD_SIZE_CHART } from "@/src/data/garments";
-import type { ChatGPTUser } from "@/app/chatgpt-auth";
+import type { AdminUser } from "@/app/admin-auth";
 import { ADMIN_EMAIL } from "@/src/config/brand";
 import type { Garment, GarmentAvailability } from "@/src/types/garment";
 
@@ -211,7 +211,7 @@ export async function getGarmentBySlug(slug: string): Promise<Garment | null> {
   return garments.find((garment) => garment.slug === slug) ?? null;
 }
 
-export async function ensureAdminMembership(user: ChatGPTUser): Promise<{ allowed: boolean; bootstrapped: boolean }> {
+export async function ensureAdminMembership(user: AdminUser): Promise<{ allowed: boolean; bootstrapped: boolean }> {
   if (user.email.trim().toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
     return { allowed: false, bootstrapped: false };
   }

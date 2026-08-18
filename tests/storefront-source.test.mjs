@@ -30,17 +30,19 @@ test("AR renderer keeps fitting when one joint is briefly hidden", async () => {
   assert.match(source, /isEmbroidered/);
 });
 
-test("admin manages unique-piece availability and production access stays restricted", async () => {
+test("admin manages unique-piece availability with a signed Cloudflare session", async () => {
   const [adminPage, auth, catalog, brand] = await Promise.all([
     readFile(new URL("../app/admin/page.tsx", import.meta.url), "utf8"),
-    readFile(new URL("../app/chatgpt-auth.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/admin-auth.ts", import.meta.url), "utf8"),
     readFile(new URL("../src/services/catalog.ts", import.meta.url), "utf8"),
     readFile(new URL("../src/config/brand.ts", import.meta.url), "utf8"),
   ]);
 
-  assert.match(adminPage, /Entrar al panel local/);
+  assert.match(adminPage, /Entrar al panel/);
   assert.match(adminPage, /AdminAvailabilityControl/);
-  assert.match(auth, /LOCAL_ADMIN_COOKIE/);
+  assert.match(auth, /ADMIN_SESSION_COOKIE/);
+  assert.match(auth, /ADMIN_PASSWORD/);
+  assert.match(auth, /HMAC/);
   assert.match(catalog, /updateGarmentAvailability/);
   assert.match(catalog, /ADMIN_EMAIL/);
   assert.match(brand, /quimbiulcoerika@gmail\.com/);

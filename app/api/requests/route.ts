@@ -1,4 +1,4 @@
-import { getChatGPTUser } from "@/app/chatgpt-auth";
+import { getAdminUser } from "@/app/admin-auth";
 import { ensureAdminMembership } from "@/src/services/catalog";
 import { createCustomerRequest, listCustomerRequests } from "@/src/services/requests";
 
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
 }
 
 export async function GET() {
-  const user = await getChatGPTUser();
+  const user = await getAdminUser();
   if (!user) return Response.json({ error: "Inicia sesión." }, { status: 401 });
   const membership = await ensureAdminMembership(user);
   if (!membership.allowed) return Response.json({ error: "No autorizado." }, { status: 403 });
