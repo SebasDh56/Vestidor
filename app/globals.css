@@ -83,13 +83,13 @@ img { display: block; max-width: 100%; }
 }
 .site-header--overlay { position: absolute; inset: 0 0 auto; color: var(--white); border-color: rgba(255,255,255,.35); }
 .brand-logo { justify-self: start; display: inline-flex; align-items: center; gap: 11px; color: inherit; }
-.brand-emblem { position: relative; display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid currentColor; border-radius: 50%; }
-.brand-emblem > span { width: 16px; height: 23px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; transform: rotate(-18deg); }
-.brand-emblem::after { content: ""; position: absolute; top: 9px; right: 8px; width: 3px; height: 3px; border-radius: 50%; background: currentColor; box-shadow: -4px 8px 0 -1px currentColor; }
+.brand-emblem-image { width: 40px; height: 40px; object-fit: contain; }
+.site-header--overlay .brand-emblem-image,
+.site-footer .brand-emblem-image { filter: brightness(0) invert(1); }
 .brand-wordmark { display: grid; gap: 2px; }
 .brand-wordmark strong { font-family: var(--serif); font-size: 19px; font-weight: 500; line-height: 1; letter-spacing: .18em; }
 .brand-wordmark small { font-size: 7px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; opacity: .75; }
-.brand-logo--compact .brand-emblem { width: 34px; height: 34px; }
+.brand-logo--compact .brand-emblem-image { width: 34px; height: 34px; }
 .brand-logo--compact .brand-wordmark small { display: none; }
 .desktop-nav { grid-column: 2; display: flex; align-items: center; gap: clamp(22px, 3vw, 48px); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .desktop-nav a { position: relative; }
@@ -685,6 +685,63 @@ img { display: block; max-width: 100%; }
 .camera-piece-color strong { font-family: var(--serif); font-size: 16px; font-weight: 400; }
 .camera-piece-color small { color: #6e7580; font-size: 9px; line-height: 1.4; }
 
+/* KILLAÉ · línea independiente de gorras bordadas */
+.caps-collection {
+  padding: clamp(92px, 11vw, 170px) clamp(20px, 6vw, 96px) clamp(88px, 10vw, 150px);
+  overflow: hidden;
+  background: #263128;
+  color: #fffaf2;
+}
+.caps-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(310px, .62fr);
+  gap: 9vw;
+  align-items: end;
+  margin-bottom: 64px;
+  padding-bottom: 42px;
+  border-bottom: 1px solid rgba(255,255,255,.2);
+}
+.caps-heading h2 {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: clamp(58px, 7vw, 112px);
+  font-weight: 400;
+  line-height: .9;
+  letter-spacing: -.05em;
+}
+.caps-heading h2 em { color: #d7b57e; font-weight: 400; }
+.caps-heading-copy { display: grid; justify-items: start; gap: 20px; }
+.caps-heading-copy > p { margin: 0; color: #e0dfd7; font-family: var(--serif); font-size: 18px; line-height: 1.55; }
+.caps-heading-copy .caps-availability-note {
+  padding-left: 16px;
+  border-left: 2px solid #d7b57e;
+  color: #bfc7bd;
+  font-family: var(--sans);
+  font-size: 11px;
+  line-height: 1.65;
+}
+.caps-heading-copy .button { margin-top: 8px; }
+.caps-gallery {
+  display: grid;
+  grid-template-columns: minmax(0, 1.18fr) minmax(280px, .82fr);
+  grid-template-rows: repeat(2, minmax(300px, 34vw));
+  gap: 16px;
+  max-width: 1420px;
+  margin: 0 auto;
+}
+.caps-card { position: relative; min-width: 0; min-height: 0; margin: 0; overflow: hidden; background: #131914; }
+.caps-card--featured { grid-row: 1 / 3; }
+.caps-card::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(10,13,10,.78), transparent 42%); pointer-events: none; }
+.caps-card img { width: 100%; height: 100%; object-fit: cover; transition: transform .7s cubic-bezier(.2,.7,.2,1), filter .4s ease; }
+.caps-card--featured img { object-position: center 42%; }
+.caps-card:hover img { transform: scale(1.025); filter: saturate(1.06); }
+.caps-card figcaption { position: absolute; z-index: 1; left: 24px; right: 24px; bottom: 22px; display: grid; gap: 6px; }
+.caps-card figcaption span { font-size: 9px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+.caps-card figcaption strong { font-family: var(--serif); font-size: clamp(24px, 2.4vw, 38px); font-weight: 400; }
+.caps-trust-row { display: grid; grid-template-columns: repeat(3, 1fr); max-width: 1420px; margin: 16px auto 0; border: 1px solid rgba(255,255,255,.2); }
+.caps-trust-row span { padding: 18px 20px; border-right: 1px solid rgba(255,255,255,.2); color: #d2d7cf; font-size: 9px; font-weight: 800; letter-spacing: .16em; text-align: center; text-transform: uppercase; }
+.caps-trust-row span:last-child { border-right: 0; }
+
 @media (max-width: 920px) {
   .unique-hero { grid-template-columns: 1fr; }
   .unique-hero-copy { min-height: 650px; }
@@ -693,6 +750,7 @@ img { display: block; max-width: 100%; }
   .drop-process { gap: 55px; }
   .admin-list article { grid-template-columns: 74px 1fr; }
   .availability-control, .admin-list article > a { grid-column: 2; }
+  .caps-heading { grid-template-columns: 1fr; gap: 42px; }
 }
 
 @media (max-width: 760px) {
@@ -713,4 +771,14 @@ img { display: block; max-width: 100%; }
   .product-title-line { align-items: flex-start; flex-direction: column; }
   .request-size-options { grid-template-columns: repeat(2, 1fr) !important; }
   .whatsapp-cta { min-height: 520px; padding: 80px 22px; }
+  .caps-collection { padding: 82px 12px 88px; }
+  .caps-heading { margin-bottom: 38px; padding: 0 12px 30px; }
+  .caps-heading h2 { font-size: clamp(54px, 15vw, 78px); }
+  .caps-heading-copy > p { font-size: 16px; }
+  .caps-gallery { grid-template-columns: 1fr; grid-template-rows: none; gap: 10px; }
+  .caps-card, .caps-card--featured { grid-row: auto; min-height: 430px; }
+  .caps-card:not(.caps-card--featured) { min-height: 340px; }
+  .caps-trust-row { grid-template-columns: 1fr; }
+  .caps-trust-row span { border-right: 0; border-bottom: 1px solid rgba(255,255,255,.2); }
+  .caps-trust-row span:last-child { border-bottom: 0; }
 }

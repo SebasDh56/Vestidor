@@ -8,9 +8,29 @@ test("storefront presents the Abrigo Andino combinations by size", async () => {
   assert.match(source, /Tu talla\./);
   assert.match(source, /Tu combinación\./);
   assert.match(source, /CombinationCollection/);
+  assert.match(source, /CapsCollection/);
+  assert.match(source, /PIEZAS ÚNICAS · MANOS LOCALES · ECUADOR/);
   assert.match(source, /Empieza por tu talla/);
   assert.match(source, /Consultar por WhatsApp/);
   assert.doesNotMatch(source, /Cuatro piezas\. Ninguna repetida|codex-preview|SkeletonPreview/);
+});
+
+test("branding and caps line communicate real availability without promising repeated designs", async () => {
+  const [layout, logo, header, caps] = await Promise.all([
+    readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../src/components/BrandLogo.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../src/components/SiteHeader.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../src/components/CapsCollection.tsx", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(layout, /Piezas artesanales con raíz ecuatoriana/);
+  assert.match(layout, /favicon\.png/);
+  assert.match(logo, /killae-emblem\.png/);
+  assert.match(header, /\/#gorras/);
+  assert.match(caps, /LÍNEA SOL · GORRAS BORDADAS/);
+  assert.match(caps, /no garantizamos que un diseño se repita/);
+  assert.match(caps, /fotografías reales de los diseños actuales/);
+  assert.equal((caps.match(/\/images\/caps\//g) ?? []).length, 3);
 });
 
 test("combination catalog maps girls, S, M and L with one editorial model per size", async () => {

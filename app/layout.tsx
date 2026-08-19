@@ -7,12 +7,16 @@ export async function generateMetadata(): Promise<Metadata> {
   const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host") ?? "localhost:3000";
   const protocol = requestHeaders.get("x-forwarded-proto") ?? (host.includes("localhost") ? "http" : "https");
   const metadataBase = new URL(`${protocol}://${host}`);
-  const title = "KILLAÉ · Abrigo Andino por talla y combinación";
-  const description = "Conoce las 13 combinaciones reales de color y diseño del Abrigo Andino KILLAÉ, organizadas por talla para niñas, S, M y L.";
+  const title = "KILLAÉ · Piezas artesanales con raíz ecuatoriana";
+  const description = "Descubre abrigos andinos y gorras bordadas seleccionadas una a una, elaboradas con manos locales y disponibles por consulta directa en Ecuador.";
   return {
     metadataBase,
     title,
     description,
+    icons: {
+      icon: [{ url: "/favicon.png", type: "image/png" }],
+      apple: "/apple-icon.png",
+    },
     openGraph: { title, description, type: "website", images: ["/og-killae-drop01.png"] },
     twitter: { card: "summary_large_image", title, description, images: ["/og-killae-drop01.png"] },
   };

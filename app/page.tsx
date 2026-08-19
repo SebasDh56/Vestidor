@@ -1,60 +1,55 @@
 import Link from "next/link";
 import { BrandLogo } from "@/src/components/BrandLogo";
+import { CapsCollection } from "@/src/components/CapsCollection";
 import { CombinationCollection } from "@/src/components/CombinationCollection";
 import { SiteHeader } from "@/src/components/SiteHeader";
 import { WHATSAPP_NUMBER } from "@/src/config/brand";
 import { COMBINATION_COUNT } from "@/src/data/combinations";
-import { listGarments } from "@/src/services/catalog";
 
 export const dynamic = "force-dynamic";
 
-export default async function Home() {
-  const garments = await listGarments();
-  const heroPiece = garments.find((item) => item.slug === "abrigo-andino-luna-roja") ?? garments[0];
-  const editorialPiece = garments.find((item) => item.slug === "abrigo-andino-noche-dorada") ?? garments[1] ?? garments[0];
-  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hola KILLAÉ, quiero conocer las combinaciones disponibles del Abrigo Andino.")}`;
+export default function Home() {
+  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hola KILLAÉ, quiero conocer las piezas disponibles hoy y recibir fotografías reales antes de reservar.")}`;
 
   return (
     <main>
       <section className="unique-hero">
         <SiteHeader />
         <div className="unique-hero-copy">
-          <p className="hero-kicker">ABRIGO ANDINO · COMBINACIONES POR TALLA · ECUADOR</p>
+          <p className="hero-kicker">PIEZAS ÚNICAS · MANOS LOCALES · ECUADOR</p>
           <h1>Tu talla.<br />Tu combinación.<br /><em>Tu raíz.</em></h1>
-          <p className="hero-description">Nuestra silueta estrella se transforma con colores y tejidos andinos distintos. Elige primero tu talla y descubre la combinación disponible para ti.</p>
+          <p className="hero-description">Elegimos cada pieza una a una y trabajamos cerca de quienes confeccionan y bordan localmente. Conoce lo disponible, mira la pieza real y reserva con atención humana.</p>
           <div className="hero-actions">
-            <Link className="button button--dark" href="/#combinaciones">Conocer combinaciones</Link>
-            <a className="text-link" href={whatsappUrl} target="_blank" rel="noreferrer">Hablar con KILLAÉ <span>↗</span></a>
+            <Link className="button button--dark" href="/#combinaciones">Descubrir abrigos</Link>
+            <Link className="text-link" href="/#gorras">Explorar gorras <span>→</span></Link>
           </div>
           <div className="hero-microfacts">
-            <span><strong>{COMBINATION_COUNT}</strong> combinaciones actuales</span>
-            <span><strong>Niñas · S · M · L</strong> tallas disponibles</span>
+            <span><strong>{COMBINATION_COUNT}</strong> combinaciones reales de abrigo</span>
+            <span><strong>Foto real</strong> antes de reservar</span>
           </div>
         </div>
-        {heroPiece && (
-          <Link className="unique-hero-visual" href="/catalogo">
-            <img src={heroPiece.imageUrl} alt={`${heroPiece.name}, abrigo andino de KILLAÉ`} />
-            <div className="hero-piece-label">
-              <span>ABRIGO ANDINO · SILUETA ESTRELLA</span>
-              <strong>Elige tu combinación</strong>
-              <small>Ver el modelo →</small>
-            </div>
-          </Link>
-        )}
+        <Link className="unique-hero-visual" href="/catalogo">
+          <img src="/images/models/abrigo-andino-talla-s-combinacion-04-v6.webp" alt="Tierra Serena, Abrigo Andino abierto KILLAÉ en talla S con tres botones forrados" />
+          <div className="hero-piece-label">
+            <span>ABRIGO ANDINO · COMBINACIÓN 04 · TALLA S</span>
+            <strong>Elige tu combinación</strong>
+            <small>Ver el modelo →</small>
+          </div>
+        </Link>
       </section>
 
       <section className="brand-promises" aria-label="Principios de KILLAÉ">
-        <span>Un modelo estrella</span><span>Tejidos andinos</span><span>Combinaciones por talla</span><span>Reserva por WhatsApp</span>
+        <span>Trabajo local cercano</span><span>Piezas que no se repiten</span><span>Disponibilidad real</span><span>Reserva por WhatsApp</span>
       </section>
 
       <section className="unique-intro" id="origen">
         <p className="eyebrow">KILLAÉ · ELEGANCIA DE RAÍZ</p>
         <div>
-          <h2>Una forma.<br />Muchos colores.<br /><em>Tu elección.</em></h2>
+          <h2>Diseño con origen.<br />Piezas con<br /><em>carácter.</em></h2>
           <div className="intro-copy">
-            <p>El Abrigo Andino mantiene su corte reconocible y cambia en la combinación de paño, puños y bolsillos. Así puedes comparar con claridad lo que existe en cada talla.</p>
-            <p className="intro-note">Cada código corresponde a una combinación real. Antes de reservar, solicita por WhatsApp medidas, disponibilidad y una fotografía completa de la prenda.</p>
-            <Link className="text-link" href="/#combinaciones">Elegir talla y combinación <span>→</span></Link>
+            <p>No buscamos llenar un catálogo con copias. Presentamos combinaciones reales y mantenemos una relación cercana con las personas que confeccionan y bordan en Ecuador.</p>
+            <p className="intro-note">Comprar KILLAÉ pone en valor el oficio local. Antes de reservar te confirmamos medidas, disponibilidad y te mostramos la pieza exacta que recibirás.</p>
+            <a className="text-link" href={whatsappUrl} target="_blank" rel="noreferrer">Conocer lo disponible <span>↗</span></a>
           </div>
         </div>
       </section>
@@ -70,30 +65,30 @@ export default async function Home() {
         </ol>
       </section>
 
-      {editorialPiece && (
-        <section className="editorial-block editorial-block--unique">
-          <div className="editorial-image"><img src={editorialPiece.imageUrl} alt={`${editorialPiece.name}, pieza única KILLAÉ`} /></div>
+      <section className="editorial-block editorial-block--unique">
+          <div className="editorial-image"><img src="/images/models/abrigo-andino-talla-m-combinacion-08-v6.webp" alt="Noche Andina, Abrigo Andino abierto KILLAÉ en talla M con tres botones forrados" /></div>
           <div className="editorial-copy">
-            <p className="eyebrow">NUESTRA SILUETA ESTRELLA</p>
-            <h2>El mismo abrigo.<br /><em>Otra expresión.</em></h2>
-            <p>El corte del Abrigo Andino crea la identidad de la colección. Los colores y detalles tejidos hacen que cada combinación tenga una presencia distinta.</p>
+            <p className="eyebrow">UNA COMPRA MÁS HUMANA</p>
+            <h2>Conoces la pieza.<br /><em>Antes de elegirla.</em></h2>
+            <p>El Abrigo Andino conserva su silueta abierta; el paño y los detalles finos de puños y bolsillos cambian en cada combinación. Te mostramos la prenda real para comprar con claridad.</p>
             <Link className="text-link" href="/#combinaciones">Comparar combinaciones <span>→</span></Link>
             <span className="editorial-number">01–13</span>
           </div>
-        </section>
-      )}
+      </section>
+
+      <CapsCollection />
 
       <section className="whatsapp-cta">
-        <p className="eyebrow">ATENCIÓN DIRECTA</p>
-        <h2>¿Ya encontraste tu combinación?</h2>
-        <p>Escríbenos con el código y la talla para confirmar medidas, disponibilidad y recibir una fotografía real.</p>
+        <p className="eyebrow">DISPONIBILIDAD REAL · ATENCIÓN DIRECTA</p>
+        <h2>Encuentra una pieza que sí sea tuya.</h2>
+        <p>Cuéntanos qué buscas. Te enviamos opciones disponibles, medidas y fotografías reales antes de cualquier reserva.</p>
         <a className="button button--light" href={whatsappUrl} target="_blank" rel="noreferrer">Consultar por WhatsApp <span>↗</span></a>
       </section>
 
       <footer className="site-footer">
-        <div><BrandLogo /><p>Elegancia de raíz.<br />Tu talla, tu combinación.</p></div>
-        <div><p className="eyebrow">EXPLORA</p><Link href="/catalogo">Combinaciones</Link><Link href="/probador">Vista orientativa</Link><Link href="/#origen">Nuestra raíz</Link></div>
-        <div><p className="eyebrow">COMPRA DIRECTA</p><a href={whatsappUrl} target="_blank" rel="noreferrer">WhatsApp</a><span>Envíos en Ecuador</span><Link href="/admin">Administración</Link></div>
+        <div><BrandLogo /><p>Elegancia de raíz.<br />Piezas elegidas una a una.</p></div>
+        <div><p className="eyebrow">EXPLORA</p><Link href="/#combinaciones">Abrigos Andinos</Link><Link href="/#gorras">Gorras bordadas</Link><Link href="/#origen">Nuestra raíz</Link></div>
+        <div><p className="eyebrow">ATENCIÓN DIRECTA</p><a href={whatsappUrl} target="_blank" rel="noreferrer">WhatsApp</a><span>Envíos en Ecuador</span><Link href="/probador">Vista orientativa</Link><Link href="/admin">Administración</Link></div>
         <p className="footer-bottom">© 2026 KILLAÉ · ELEGANCIA DE RAÍZ · ECUADOR</p>
       </footer>
     </main>

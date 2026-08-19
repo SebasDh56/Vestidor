@@ -8,7 +8,14 @@ export function BrandLogo({ compact = false }: { compact?: boolean }) {
       href="/"
       aria-label={`${BRAND_NAME}, inicio`}
     >
-      <span className="brand-emblem" aria-hidden="true"><span /></span>
+      <img
+        className="brand-emblem-image"
+        src="/brand/killae-emblem.png"
+        alt=""
+        width={40}
+        height={40}
+        aria-hidden="true"
+      />
       <span className="brand-wordmark">
         <strong>{BRAND_NAME}</strong>
         <small>{BRAND_TAGLINE}</small>

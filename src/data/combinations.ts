@@ -27,7 +27,7 @@ export const COMBINATION_SIZE_GROUPS: CombinationSizeGroup[] = [
     range: "Combinaciones 01–03",
     imageUrl: "/images/combinations/abrigo-andino-ninas-01-03.webp",
     imageAlt: "Combinaciones 01, 02 y 03 del Abrigo Andino KILLAÉ para niñas",
-    modelImageUrl: "/images/models/abrigo-andino-ninas-combinacion-01-v4.webp",
+    modelImageUrl: "/images/models/abrigo-andino-ninas-combinacion-01-v6.webp",
     modelImageAlt: "Modelo infantil con Abrigo Andino KILLAÉ combinación 01 en un jardín de los Andes",
     modelCombinationCode: "01",
     combinations: [
@@ -43,7 +43,7 @@ export const COMBINATION_SIZE_GROUPS: CombinationSizeGroup[] = [
     range: "Combinaciones 04–06",
     imageUrl: "/images/combinations/abrigo-andino-talla-s-04-06.webp",
     imageAlt: "Combinaciones 04, 05 y 06 del Abrigo Andino KILLAÉ en talla S",
-    modelImageUrl: "/images/models/abrigo-andino-talla-s-combinacion-04-v4.webp",
+    modelImageUrl: "/images/models/abrigo-andino-talla-s-combinacion-04-v6.webp",
     modelImageAlt: "Modelo con Abrigo Andino KILLAÉ talla S combinación 04 junto a una laguna de páramo",
     modelCombinationCode: "04",
     combinations: [
@@ -59,7 +59,7 @@ export const COMBINATION_SIZE_GROUPS: CombinationSizeGroup[] = [
     range: "Combinaciones 07–10",
     imageUrl: "/images/combinations/abrigo-andino-talla-m-07-10.webp",
     imageAlt: "Combinaciones 07, 08, 09 y 10 del Abrigo Andino KILLAÉ en talla M",
-    modelImageUrl: "/images/models/abrigo-andino-talla-m-combinacion-08-v4.webp",
+    modelImageUrl: "/images/models/abrigo-andino-talla-m-combinacion-08-v6.webp",
     modelImageAlt: "Modelo con Abrigo Andino KILLAÉ talla M combinación 08 en una calle patrimonial",
     modelCombinationCode: "08",
     combinations: [
@@ -76,7 +76,7 @@ export const COMBINATION_SIZE_GROUPS: CombinationSizeGroup[] = [
     range: "Combinaciones 11–13",
     imageUrl: "/images/combinations/abrigo-andino-talla-l-11-13.webp",
     imageAlt: "Combinaciones 11, 12 y 13 del Abrigo Andino KILLAÉ en talla L",
-    modelImageUrl: "/images/models/abrigo-andino-talla-l-combinacion-11-v4.webp",
+    modelImageUrl: "/images/models/abrigo-andino-talla-l-combinacion-11-v6.webp",
     modelImageAlt: "Modelo con Abrigo Andino KILLAÉ talla L combinación 11 frente a un paisaje volcánico",
     modelCombinationCode: "11",
     combinations: [
