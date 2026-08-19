@@ -8,7 +8,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const protocol = requestHeaders.get("x-forwarded-proto") ?? (host.includes("localhost") ? "http" : "https");
   const metadataBase = new URL(`${protocol}://${host}`);
   const title = "KILLAÉ · Abrigo Andino por talla y combinación";
-  const description = "Conoce las combinaciones reales de color y diseño del Abrigo Andino KILLAÉ, organizadas por talla para niñas, S y M.";
+  const description = "Conoce las 13 combinaciones reales de color y diseño del Abrigo Andino KILLAÉ, organizadas por talla para niñas, S, M y L.";
   return {
     metadataBase,
     title,

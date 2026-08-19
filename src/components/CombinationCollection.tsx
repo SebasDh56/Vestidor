@@ -14,7 +14,8 @@ export function CombinationCollection({ catalog = false }: { catalog?: boolean }
         </div>
         <div className="combination-heading-copy">
           <p>Una misma silueta, distintas expresiones textiles. Empieza por tu talla y elige el código que más se parece a ti.</p>
-          <span>Disponibles ahora: Niñas · S · M</span>
+          <p>El Abrigo Andino se lleva siempre abierto. Su detalle tejido es fino y termina exactamente en el filo de cada manga.</p>
+          <span>Disponibles ahora: Niñas · S · M · L</span>
         </div>
       </header>
 
@@ -54,15 +55,19 @@ export function CombinationCollection({ catalog = false }: { catalog?: boolean }
                 );
               })}
             </div>
+            <figure className="combination-model">
+              <img src={group.modelImageUrl} alt={group.modelImageAlt} loading="lazy" />
+              <figcaption>
+                <span>Visualización editorial con IA</span>
+                <strong>Combinación {group.modelCombinationCode}</strong>
+              </figcaption>
+            </figure>
           </article>
         ))}
       </div>
-
-      <aside className="combination-upcoming">
-        <span>PRÓXIMA TALLA</span>
-        <strong>L</strong>
-        <p>Nuevas combinaciones se sumarán a la familia Abrigo Andino.</p>
-      </aside>
+      <p className="combination-disclaimer">
+        Las fotografías con modelo son recreaciones editoriales con IA para visualizar el conjunto. Antes de reservar, confirma por WhatsApp la medida y solicita una fotografía de la prenda real.
+      </p>
     </section>
   );
 }

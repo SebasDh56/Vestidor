@@ -28,7 +28,7 @@ export default async function Home() {
           </div>
           <div className="hero-microfacts">
             <span><strong>{COMBINATION_COUNT}</strong> combinaciones actuales</span>
-            <span><strong>Niñas · S · M</strong> tallas disponibles</span>
+            <span><strong>Niñas · S · M · L</strong> tallas disponibles</span>
           </div>
         </div>
         {heroPiece && (
@@ -64,7 +64,7 @@ export default async function Home() {
       <section className="drop-process">
         <div className="choice-heading"><p className="eyebrow">COMPRAR SIN COMPLICARLO</p><h2>La ves.<br /><em>La confirmas.</em><br />La reservas.</h2></div>
         <ol>
-          <li><span>01</span><div><h3>Empieza por tu talla</h3><p>Elige Niñas, S o M para ver solamente las combinaciones preparadas en esa medida.</p></div></li>
+          <li><span>01</span><div><h3>Empieza por tu talla</h3><p>Elige Niñas, S, M o L para ver solamente las combinaciones preparadas en esa medida.</p></div></li>
           <li><span>02</span><div><h3>Escoge tu combinación</h3><p>Compara el paño y el detalle textil de puños y bolsillos. Cada opción tiene un código claro.</p></div></li>
           <li><span>03</span><div><h3>Reserva con atención humana</h3><p>Confirmamos disponibilidad y entrega antes de cualquier pago. Sin carrito ni cobros automáticos.</p></div></li>
         </ol>
@@ -78,7 +78,7 @@ export default async function Home() {
             <h2>El mismo abrigo.<br /><em>Otra expresión.</em></h2>
             <p>El corte del Abrigo Andino crea la identidad de la colección. Los colores y detalles tejidos hacen que cada combinación tenga una presencia distinta.</p>
             <Link className="text-link" href="/#combinaciones">Comparar combinaciones <span>→</span></Link>
-            <span className="editorial-number">01–10</span>
+            <span className="editorial-number">01–13</span>
           </div>
         </section>
       )}

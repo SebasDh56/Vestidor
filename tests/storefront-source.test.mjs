@@ -13,7 +13,7 @@ test("storefront presents the Abrigo Andino combinations by size", async () => {
   assert.doesNotMatch(source, /Cuatro piezas\. Ninguna repetida|codex-preview|SkeletonPreview/);
 });
 
-test("combination catalog maps girls, S and M without inventing size L", async () => {
+test("combination catalog maps girls, S, M and L with one editorial model per size", async () => {
   const [data, component] = await Promise.all([
     readFile(new URL("../src/data/combinations.ts", import.meta.url), "utf8"),
     readFile(new URL("../src/components/CombinationCollection.tsx", import.meta.url), "utf8"),
@@ -22,11 +22,13 @@ test("combination catalog maps girls, S and M without inventing size L", async (
   assert.match(data, /Combinaciones 01–03/);
   assert.match(data, /Combinaciones 04–06/);
   assert.match(data, /Combinaciones 07–10/);
+  assert.match(data, /Combinaciones 11–13/);
   assert.match(data, /sizeLabel: "Niñas"/);
   assert.match(data, /sizeLabel: "Talla S"/);
   assert.match(data, /sizeLabel: "Talla M"/);
-  assert.doesNotMatch(data, /sizeLabel: "Talla L"/);
-  assert.match(component, /PRÓXIMA TALLA/);
+  assert.match(data, /sizeLabel: "Talla L"/);
+  assert.equal((data.match(/modelImageUrl: "\/images\/models\//g) ?? []).length, 4);
+  assert.match(component, /Visualización editorial con IA/);
   assert.match(component, /wa\.me/);
 });
 

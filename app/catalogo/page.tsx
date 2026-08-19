@@ -14,7 +14,7 @@ export default function CatalogPage() {
         <p>Primero identifica tu talla disponible; después compara el paño y los detalles textiles de cada código. Una forma simple de encontrar tu Abrigo Andino.</p>
       </section>
       <CombinationCollection catalog />
-      <p className="catalog-transparency">Las láminas muestran las combinaciones disponibles de paño y detalle textil. Antes de reservar, solicita por WhatsApp medidas y fotografías completas de la prenda real.</p>
+      <p className="catalog-transparency">Las láminas muestran las combinaciones disponibles de paño y detalle textil; las modelos son visualizaciones editoriales con IA. Antes de reservar, solicita por WhatsApp medidas y fotografías completas de la prenda real.</p>
     </main>
   );
 }
