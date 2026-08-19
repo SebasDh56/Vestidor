@@ -58,16 +58,14 @@ export function CombinationCollection({ catalog = false }: { catalog?: boolean }
             <figure className="combination-model">
               <img src={group.modelImageUrl} alt={group.modelImageAlt} loading="lazy" />
               <figcaption>
-                <span>Visualización editorial con IA</span>
+               
                 <strong>Combinación {group.modelCombinationCode}</strong>
               </figcaption>
             </figure>
           </article>
         ))}
       </div>
-      <p className="combination-disclaimer">
-        Las fotografías con modelo son recreaciones editoriales con IA para visualizar el conjunto. Antes de reservar, confirma por WhatsApp la medida y solicita una fotografía de la prenda real.
-      </p>
+      
     </section>
   );
 }
