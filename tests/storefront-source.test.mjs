@@ -30,6 +30,8 @@ test("branding and caps line communicate real availability without promising rep
   assert.match(caps, /LÍNEA SOL · GORRAS BORDADAS/);
   assert.match(caps, /no garantizamos que un diseño se repita/);
   assert.match(caps, /fotografías reales de los diseños actuales/);
+  assert.match(caps, /Visualización editorial con IA/);
+  assert.match(caps, /fotografías reales de la gorra disponible/);
   assert.equal((caps.match(/\/images\/caps\//g) ?? []).length, 3);
 });
 

@@ -2,19 +2,19 @@ import { WHATSAPP_NUMBER } from "@/src/config/brand";
 
 const CAP_REFERENCES = [
   {
-    name: "Aves y naturaleza",
-    imageUrl: "/images/caps/gorra-colibri-negra.webp",
-    imageAlt: "Gorra negra KILLAÉ con bordado artesanal de colibrí, flores y geometría",
+    name: "Colibrí de ciudad",
+    imageUrl: "/images/caps/gorra-colibri-negra-editorial-v2.webp",
+    imageAlt: "Visualización editorial de una modelo con gorra negra KILLAÉ bordada con colibrí y flores",
   },
   {
-    name: "Raíz y color",
-    imageUrl: "/images/caps/gorra-raiz-verde.webp",
-    imageAlt: "Gorra verde KILLAÉ con bordado artesanal multicolor",
+    name: "Ritmo de los Andes",
+    imageUrl: "/images/caps/gorra-raiz-verde-editorial-v2.webp",
+    imageAlt: "Visualización editorial de un modelo con gorra verde KILLAÉ bordada con figuras andinas",
   },
   {
-    name: "Flores de altura",
-    imageUrl: "/images/caps/gorra-flores-tierra.webp",
-    imageAlt: "Gorra color tierra KILLAÉ con bordado artesanal de flores",
+    name: "Jardín de altura",
+    imageUrl: "/images/caps/gorra-flores-tierra-editorial-v2.webp",
+    imageAlt: "Visualización editorial de una modelo con gorra color tierra KILLAÉ bordada con flores",
   },
 ] as const;
 
@@ -46,17 +46,22 @@ export function CapsCollection() {
         </div>
       </header>
 
-      <div className="caps-gallery" aria-label="Referencias reales de gorras bordadas KILLAÉ">
+      <div className="caps-gallery" aria-label="Visualizaciones editoriales de gorras bordadas KILLAÉ">
         {CAP_REFERENCES.map((reference, index) => (
           <figure className={index === 0 ? "caps-card caps-card--featured" : "caps-card"} key={reference.name}>
             <img src={reference.imageUrl} alt={reference.imageAlt} loading="lazy" />
             <figcaption>
-              <span>Referencia de estilo {String(index + 1).padStart(2, "0")}</span>
+              <span>Visualización editorial con IA · {String(index + 1).padStart(2, "0")}</span>
               <strong>{reference.name}</strong>
             </figcaption>
           </figure>
         ))}
       </div>
+
+      <p className="caps-editorial-note">
+        Las escenas y modelos son visualizaciones editoriales con IA para mostrar posibles formas de uso.
+        Antes de reservar, te enviamos por WhatsApp fotografías reales de la gorra disponible.
+      </p>
 
       <div className="caps-trust-row" aria-label="Características de la línea de gorras">
         <span>Bordado artesanal</span>
