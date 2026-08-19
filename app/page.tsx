@@ -86,9 +86,9 @@ export default function Home() {
       </section>
 
       <footer className="site-footer">
-        <div><BrandLogo /><p>Elegancia de raíz.<br />Piezas elegidas una a una.</p></div>
-        <div><p className="eyebrow">EXPLORA</p><Link href="/#combinaciones">Abrigos Andinos</Link><Link href="/#gorras">Gorras bordadas</Link><Link href="/#origen">Nuestra raíz</Link></div>
-        <div><p className="eyebrow">ATENCIÓN DIRECTA</p><a href={whatsappUrl} target="_blank" rel="noreferrer">WhatsApp</a><span>Envíos en Ecuador</span><Link href="/probador">Vista orientativa</Link><Link href="/admin">Administración</Link></div>
+        <div><BrandLogo /><p>Elegancia de raíz.<br />Tu talla, tu combinación.</p></div>
+        <div><p className="eyebrow">EXPLORA</p><Link href="/catalogo">Combinaciones</Link><Link href="/probador">Vista orientativa</Link><Link href="/#origen">Nuestra raíz</Link></div>
+        <div><p className="eyebrow">COMPRA DIRECTA</p><a href={whatsappUrl} target="_blank" rel="noreferrer">WhatsApp</a><span>Envíos en Ecuador</span><Link href="/admin">Administración</Link></div>
         <p className="footer-bottom">© 2026 KILLAÉ · ELEGANCIA DE RAÍZ · ECUADOR</p>
       </footer>
     </main>
