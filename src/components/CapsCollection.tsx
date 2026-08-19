@@ -51,7 +51,7 @@ export function CapsCollection() {
           <figure className={index === 0 ? "caps-card caps-card--featured" : "caps-card"} key={reference.name}>
             <img src={reference.imageUrl} alt={reference.imageAlt} loading="lazy" />
             <figcaption>
-              <span>Visualización editorial con IA · {String(index + 1).padStart(2, "0")}</span>
+             
               <strong>{reference.name}</strong>
             </figcaption>
           </figure>

@@ -30,7 +30,7 @@ test("branding and caps line communicate real availability without promising rep
   assert.match(caps, /LÍNEA SOL · GORRAS BORDADAS/);
   assert.match(caps, /no garantizamos que un diseño se repita/);
   assert.match(caps, /fotografías reales de los diseños actuales/);
-  assert.match(caps, /Visualización editorial con IA/);
+  
   assert.match(caps, /fotografías reales de la gorra disponible/);
   assert.equal((caps.match(/\/images\/caps\//g) ?? []).length, 3);
 });
@@ -50,7 +50,7 @@ test("combination catalog maps girls, S, M and L with one editorial model per si
   assert.match(data, /sizeLabel: "Talla M"/);
   assert.match(data, /sizeLabel: "Talla L"/);
   assert.equal((data.match(/modelImageUrl: "\/images\/models\//g) ?? []).length, 4);
-  assert.match(component, /Visualización editorial con IA/);
+ 
   assert.match(component, /wa\.me/);
 });
 
