@@ -9,87 +9,341 @@ import { COMBINATION_COUNT } from "@/src/data/combinations";
 export const dynamic = "force-dynamic";
 
 export default function Home() {
-  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hola KILLAÉ, quiero conocer las piezas disponibles hoy y recibir fotografías reales antes de reservar.")}`;
+  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+    "Hola KILLAÉ, quiero conocer las piezas disponibles en mi talla y recibir fotografías reales antes de reservar."
+  )}`;
 
   return (
     <main>
+      {/* HERO */}
       <section className="unique-hero">
         <SiteHeader />
+
         <div className="unique-hero-copy">
-          <p className="hero-kicker">PIEZAS ÚNICAS · MANOS LOCALES · ECUADOR</p>
-          <h1>Tu talla.<br />Tu combinación.<br /><em>Tu raíz.</em></h1>
-          <p className="hero-description">Elegimos cada pieza una a una y trabajamos cerca de quienes confeccionan y bordan localmente. Conoce lo disponible, mira la pieza real y reserva con atención humana.</p>
+          <p className="hero-kicker">
+            DISEÑOS QUE NO PASAN DESAPERCIBIDOS · ECUADOR
+          </p>
+
+          <h1>
+            Hay abrigos que combinan
+            <br />
+            con tu look.
+            <br />
+            <em>Este cambia tu look.</em>
+          </h1>
+
+          <p className="hero-description">
+            Elige tu talla y descubre combinaciones de color y detalles
+            textiles pensadas para darle personalidad incluso al outfit más
+            sencillo. Mira la pieza real antes de reservar y elige exactamente
+            la que quieres llevar.
+          </p>
+
           <div className="hero-actions">
-            <Link className="button button--dark" href="/#combinaciones">Descubrir abrigos</Link>
-            <Link className="text-link" href="/#gorras">Explorar gorras <span>→</span></Link>
+            <Link
+              className="button button--dark"
+              href="/#combinaciones"
+            >
+              Ver mi talla
+            </Link>
+
+            <Link
+              className="text-link"
+              href="/#combinaciones"
+            >
+              Ver las {COMBINATION_COUNT} combinaciones <span>→</span>
+            </Link>
           </div>
+
           <div className="hero-microfacts">
-            <span><strong>{COMBINATION_COUNT}</strong> combinaciones reales de abrigo</span>
-            <span><strong>Foto real</strong> antes de reservar</span>
+            <span>
+              <strong>{COMBINATION_COUNT}</strong> combinaciones
+            </span>
+
+            <span>
+              <strong>Niñas · S · M · L</strong>
+            </span>
+
+            <span>
+              <strong>Foto real</strong> antes de reservar
+            </span>
           </div>
         </div>
-        <Link className="unique-hero-visual" href="/catalogo">
-          <img src="/images/models/abrigo-andino-talla-s-combinacion-04-v6.webp" alt="Tierra Serena, Abrigo Andino abierto KILLAÉ en talla S con tres botones forrados" />
+
+        <Link
+          className="unique-hero-visual"
+          href="/catalogo"
+        >
+          <img
+            src="/images/models/abrigo-andino-talla-s-combinacion-04-v6.webp"
+            alt="Tierra Serena, Abrigo Andino abierto KILLAÉ en talla S con tres botones forrados"
+          />
+
           <div className="hero-piece-label">
-            <span>ABRIGO ANDINO · COMBINACIÓN 04 · TALLA S</span>
-            <strong>Elige tu combinación</strong>
-            <small>Ver el modelo →</small>
+            <span>
+              ABRIGO ANDINO · COMBINACIÓN 04 · TALLA S
+            </span>
+
+            <strong>¿Te imaginas tu próximo look con este?</strong>
+
+            <small>Quiero verlo →</small>
           </div>
         </Link>
       </section>
 
-      <section className="brand-promises" aria-label="Principios de KILLAÉ">
-        <span>Trabajo local cercano</span><span>Piezas que no se repiten</span><span>Disponibilidad real</span><span>Reserva por WhatsApp</span>
+      {/* PROMESAS */}
+      <section
+        className="brand-promises"
+        aria-label="Principios de KILLAÉ"
+      >
+        <span>Combinaciones con personalidad</span>
+        <span>Disponibilidad real</span>
+        <span>Foto real antes de reservar</span>
+        <span>Atención directa por WhatsApp</span>
       </section>
 
-      <section className="unique-intro" id="origen">
-        <p className="eyebrow">KILLAÉ · ELEGANCIA DE RAÍZ</p>
+      {/* IDENTIDAD */}
+      <section
+        className="unique-intro"
+        id="origen"
+      >
+        <p className="eyebrow">
+          KILLAÉ · DISEÑO CON IDENTIDAD
+        </p>
+
         <div>
-          <h2>Diseño con origen.<br />Piezas con<br /><em>carácter.</em></h2>
+          <h2>
+            Hecho para vestir diferente.
+            <br />
+            <em>No para vestir igual.</em>
+          </h2>
+
           <div className="intro-copy">
-            <p>No buscamos llenar un catálogo con copias. Presentamos combinaciones reales y mantenemos una relación cercana con las personas que confeccionan y bordan en Ecuador.</p>
-            <p className="intro-note">Comprar KILLAÉ pone en valor el oficio local. Antes de reservar te confirmamos medidas, disponibilidad y te mostramos la pieza exacta que recibirás.</p>
-            <a className="text-link" href={whatsappUrl} target="_blank" rel="noreferrer">Conocer lo disponible <span>↗</span></a>
+            <p>
+              En KILLAÉ elegimos combinaciones que tengan algo que decir:
+              colores, paños y detalles textiles que convierten cada abrigo
+              en la pieza protagonista del look.
+            </p>
+
+            <p className="intro-note">
+              Trabajamos cerca de quienes confeccionan y bordan en Ecuador.
+              Antes de que reserves, confirmamos medidas, disponibilidad y te
+              mostramos fotografías de la pieza real.
+            </p>
+
+            <a
+              className="text-link"
+              href={whatsappUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Ver qué hay disponible <span>↗</span>
+            </a>
           </div>
         </div>
       </section>
 
+      {/* COMBINACIONES */}
       <CombinationCollection />
 
+      {/* PROCESO DE COMPRA */}
       <section className="drop-process">
-        <div className="choice-heading"><p className="eyebrow">COMPRAR SIN COMPLICARLO</p><h2>La ves.<br /><em>La confirmas.</em><br />La reservas.</h2></div>
+        <div className="choice-heading">
+          <p className="eyebrow">
+            ENCONTRAR EL TUYO ES FÁCIL
+          </p>
+
+          <h2>
+            Lo ves.
+            <br />
+            <em>Lo eliges.</em>
+            <br />
+            Lo reservas.
+          </h2>
+        </div>
+
         <ol>
-          <li><span>01</span><div><h3>Empieza por tu talla</h3><p>Elige Niñas, S, M o L para ver solamente las combinaciones preparadas en esa medida.</p></div></li>
-          <li><span>02</span><div><h3>Escoge tu combinación</h3><p>Compara el paño y el detalle textil de puños y bolsillos. Cada opción tiene un código claro.</p></div></li>
-          <li><span>03</span><div><h3>Reserva con atención humana</h3><p>Confirmamos disponibilidad y entrega antes de cualquier pago. Sin carrito ni cobros automáticos.</p></div></li>
+          <li>
+            <span>01</span>
+
+            <div>
+              <h3>Encuentra tu talla</h3>
+
+              <p>
+                Elige Niñas, S, M o L y mira las combinaciones preparadas
+                para esa medida.
+              </p>
+            </div>
+          </li>
+
+          <li>
+            <span>02</span>
+
+            <div>
+              <h3>Elige tu favorita</h3>
+
+              <p>
+                Cada combinación tiene su propio código, colores y detalles
+                para que puedas pedir exactamente la que viste.
+              </p>
+            </div>
+          </li>
+
+          <li>
+            <span>03</span>
+
+            <div>
+              <h3>Escríbenos por WhatsApp</h3>
+
+              <p>
+                Dinos el código que te gustó y confirmamos disponibilidad,
+                medidas y opciones de entrega.
+              </p>
+            </div>
+          </li>
+
+          <li>
+            <span>04</span>
+
+            <div>
+              <h3>Mira la pieza real</h3>
+
+              <p>
+                Antes de reservar te mostramos fotografías reales de la
+                prenda disponible para que sepas exactamente qué estás
+                eligiendo.
+              </p>
+            </div>
+          </li>
         </ol>
       </section>
 
+      {/* BLOQUE EDITORIAL / CONFIANZA */}
       <section className="editorial-block editorial-block--unique">
-          <div className="editorial-image"><img src="/images/models/abrigo-andino-talla-m-combinacion-08-v6.webp" alt="Noche Andina, Abrigo Andino abierto KILLAÉ en talla M con tres botones forrados" /></div>
-          <div className="editorial-copy">
-            <p className="eyebrow">UNA COMPRA MÁS HUMANA</p>
-            <h2>Conoces la pieza.<br /><em>Antes de elegirla.</em></h2>
-            <p>El Abrigo Andino conserva su silueta abierta; el paño y los detalles finos de puños y bolsillos cambian en cada combinación. Te mostramos la prenda real para comprar con claridad.</p>
-            <Link className="text-link" href="/#combinaciones">Comparar combinaciones <span>→</span></Link>
-            <span className="editorial-number">01–13</span>
-          </div>
+        <div className="editorial-image">
+          <img
+            src="/images/models/abrigo-andino-talla-m-combinacion-08-v6.webp"
+            alt="Noche Andina, Abrigo Andino abierto KILLAÉ en talla M con tres botones forrados"
+          />
+        </div>
+
+        <div className="editorial-copy">
+          <p className="eyebrow">
+            COMPRA CON MÁS SEGURIDAD
+          </p>
+
+          <h2>
+            La foto bonita te enamora.
+            <br />
+            <em>La foto real te ayuda a decidir.</em>
+          </h2>
+
+          <p>
+            Las imágenes editoriales te muestran cómo puede lucir el Abrigo
+            Andino puesto. Antes de reservar te enseñamos fotografías reales
+            de la pieza disponible, confirmamos sus medidas y resolvemos tus
+            dudas directamente.
+          </p>
+
+          <Link
+            className="text-link"
+            href="/#combinaciones"
+          >
+            Comparar combinaciones <span>→</span>
+          </Link>
+
+          <span className="editorial-number">
+            01–{COMBINATION_COUNT}
+          </span>
+        </div>
       </section>
 
+      {/* GORRAS */}
       <CapsCollection />
 
+      {/* CTA WHATSAPP */}
       <section className="whatsapp-cta">
-        <p className="eyebrow">DISPONIBILIDAD REAL · ATENCIÓN DIRECTA</p>
-        <h2>Encuentra una pieza que sí sea tuya.</h2>
-        <p>Cuéntanos qué buscas. Te enviamos opciones disponibles, medidas y fotografías reales antes de cualquier reserva.</p>
-        <a className="button button--light" href={whatsappUrl} target="_blank" rel="noreferrer">Consultar por WhatsApp <span>↗</span></a>
+        <p className="eyebrow">
+          YA VISTE LAS COMBINACIONES · AHORA FALTA LA TUYA
+        </p>
+
+        <h2>
+          ¿Cuál usarías tú?
+        </h2>
+
+        <p>
+          Dinos tu talla o mándanos el código de la combinación que te gustó.
+          Te mostramos disponibilidad, medidas y fotografías reales antes de
+          reservar.
+        </p>
+
+        <a
+          className="button button--light"
+          href={whatsappUrl}
+          target="_blank"
+          rel="noreferrer"
+        >
+          Quiero ver mi talla <span>↗</span>
+        </a>
       </section>
 
+      {/* FOOTER */}
       <footer className="site-footer">
-        <div><BrandLogo /><p>Elegancia de raíz.<br />Piezas elegidas una a una.</p></div>
-        <div><p className="eyebrow">EXPLORA</p><Link href="/#combinaciones">Abrigos Andinos</Link><Link href="/#gorras">Gorras bordadas</Link><Link href="/#origen">Nuestra raíz</Link></div>
-        <div><p className="eyebrow">ATENCIÓN DIRECTA</p><a href={whatsappUrl} target="_blank" rel="noreferrer">WhatsApp</a><span>Envíos en Ecuador</span><Link href="/probador">Vista orientativa</Link><Link href="/admin">Administración</Link></div>
-        <p className="footer-bottom">© 2026 KILLAÉ · ELEGANCIA DE RAÍZ · ECUADOR</p>
+        <div>
+          <BrandLogo />
+
+          <p>
+            Diseño con identidad.
+            <br />
+            Encuentra la combinación que va contigo.
+          </p>
+        </div>
+
+        <div>
+          <p className="eyebrow">EXPLORA</p>
+
+          <Link href="/#combinaciones">
+            Abrigos Andinos
+          </Link>
+
+          <Link href="/#gorras">
+            Gorras bordadas
+          </Link>
+
+          <Link href="/#origen">
+            Nuestra historia
+          </Link>
+        </div>
+
+        <div>
+          <p className="eyebrow">
+            COMPRA DIRECTA
+          </p>
+
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
+            WhatsApp
+          </a>
+
+          <span>
+            Envíos en Ecuador
+          </span>
+
+          <Link href="/probador">
+            Pruébatelo
+          </Link>
+
+          <Link href="/admin">
+            Administración
+          </Link>
+        </div>
+
+        <p className="footer-bottom">
+          © 2026 KILLAÉ · ELEGANCIA DE RAÍZ · ECUADOR
+        </p>
       </footer>
     </main>
   );

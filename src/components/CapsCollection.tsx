@@ -33,7 +33,7 @@ export function CapsCollection() {
         </div>
         <div className="caps-heading-copy">
           <p>
-            Una línea independiente del Abrigo Andino: gorras para el sol, bordadas con carácter propio
+            Un accesorio que resalta en cualquier lugar: gorras para el sol, bordadas con carácter propio
             y seleccionadas una a una.
           </p>
           <p className="caps-availability-note">
@@ -59,8 +59,7 @@ export function CapsCollection() {
       </div>
 
       <p className="caps-editorial-note">
-        Las escenas y modelos son visualizaciones editoriales con IA para mostrar posibles formas de uso.
-        Antes de reservar, te enviamos por WhatsApp fotografías reales de la gorra disponible.
+        Las imágenes editoriales muestran cómo puede lucir la gorra puesta. Antes de reservar te enseñamos fotografías de las piezas disponibles.
       </p>
 
       <div className="caps-trust-row" aria-label="Características de la línea de gorras">
