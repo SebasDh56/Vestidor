@@ -289,6 +289,7 @@ export default function Home() {
 
       {/* FOOTER */}
       <footer className="site-footer">
+<<<<<<< HEAD
         <div>
           <BrandLogo />
 
@@ -344,6 +345,12 @@ export default function Home() {
         <p className="footer-bottom">
           © 2026 KILLAÉ · ELEGANCIA DE RAÍZ · ECUADOR
         </p>
+=======
+        <div><BrandLogo /><p>Elegancia de raíz.<br />Tu talla, tu combinación.</p></div>
+        <div><p className="eyebrow">EXPLORA</p><Link href="/catalogo">Combinaciones</Link><Link href="/probador">Vista orientativa</Link><Link href="/#origen">Nuestra raíz</Link></div>
+        <div><p className="eyebrow">COMPRA DIRECTA</p><a href={whatsappUrl} target="_blank" rel="noreferrer">WhatsApp</a><span>Envíos en Ecuador</span><Link href="/admin">Administración</Link></div>
+        <p className="footer-bottom">© 2026 KILLAÉ · ELEGANCIA DE RAÍZ · ECUADOR</p>
+>>>>>>> e8881bfa7ddfd6ef930a16a631cab0bb3892a872
       </footer>
     </main>
   );

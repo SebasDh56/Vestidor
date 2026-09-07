@@ -32,14 +32,13 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
             <input type="hidden" name="returnTo" value="/admin" />
             <label>
               Correo administrativo
-              <input name="email" type="email" defaultValue={ADMIN_EMAIL} autoComplete="username" required />
+              <input name="email" type="email" autoComplete="username" required />
             </label>
             <label>
               Contraseña
               <input name="password" type="password" autoComplete="current-password" minLength={8} required />
             </label>
             {error === "credentials" && <p className="admin-login-error">Correo o contraseña incorrectos.</p>}
-            {(error === "configuration" || !authConfigured) && <p className="admin-login-error">Falta configurar el secreto ADMIN_PASSWORD en Cloudflare.</p>}
             <button className="button button--dark" type="submit" disabled={!authConfigured}>Entrar al panel</button>
           </form>
           <small className="admin-login-hint">Sesión privada protegida por una cookie firmada. La contraseña nunca se guarda en el navegador.</small>
