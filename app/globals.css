@@ -785,3 +785,178 @@ img { display: block; max-width: 100%; }
   .caps-trust-row span { border-right: 0; border-bottom: 1px solid rgba(255,255,255,.2); }
   .caps-trust-row span:last-child { border-bottom: 0; }
 }
+.caps-real-section {
+  margin-top: 4rem;
+}
+
+.caps-real-heading {
+  max-width: 620px;
+  margin-bottom: 1.5rem;
+}
+
+.caps-real-heading h3 {
+  margin: 0.35rem 0 0.65rem;
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  line-height: 0.95;
+}
+
+.caps-real-heading p {
+  max-width: 540px;
+  opacity: 0.72;
+  line-height: 1.6;
+}
+
+.caps-slider {
+  display: grid;
+  grid-auto-flow: column;
+
+  /* 4 gorras visibles */
+  grid-auto-columns: calc((100% - 3rem) / 4);
+
+  gap: 1rem;
+
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+
+  padding: 0.5rem 0 1.25rem;
+
+  scroll-snap-type: inline mandatory;
+  scrollbar-width: thin;
+}
+
+.cap-product-card {
+  min-width: 0;
+  scroll-snap-align: start;
+  cursor: pointer;
+}
+
+.cap-product-images {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+
+  overflow: hidden;
+  background: #f3f0ea;
+}
+
+.cap-product-image {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  opacity: 0;
+  transform: scale(1.01);
+
+  transition:
+    opacity 0.55s ease,
+    transform 0.8s ease;
+}
+
+/* Primera foto visible normalmente */
+.cap-product-image:first-child {
+  opacity: 1;
+}
+
+/* Al pasar el mouse ocultamos la primera */
+.cap-product-card:hover .cap-product-image:first-child {
+  opacity: 0;
+}
+
+/* Segunda toma */
+.cap-product-card:hover .cap-product-image:nth-child(2) {
+  opacity: 1;
+  animation: capImageTwo 3s infinite;
+}
+
+/* Tercera toma */
+.cap-product-card:hover .cap-product-image:nth-child(3) {
+  animation: capImageThree 3s infinite;
+}
+
+.cap-product-card:hover .cap-product-image {
+  transform: scale(1.035);
+}
+
+@keyframes capImageTwo {
+  0%,
+  42% {
+    opacity: 1;
+  }
+
+  50%,
+  92% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes capImageThree {
+  0%,
+  42% {
+    opacity: 0;
+  }
+
+  50%,
+  92% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+.cap-product-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 1rem;
+
+  padding-top: 0.8rem;
+}
+
+.cap-product-info strong {
+  font-size: 0.95rem;
+}
+
+.cap-product-info span {
+  font-size: 0.72rem;
+  opacity: 0.55;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Tablet */
+@media (max-width: 950px) {
+  .caps-slider {
+    grid-auto-columns: calc((100% - 2rem) / 3);
+  }
+}
+
+/* Mobile */
+@media (max-width: 650px) {
+  .caps-real-section {
+    margin-top: 3rem;
+  }
+
+  .caps-slider {
+    /*
+      Mostramos 1 gorra completa y parte de la siguiente
+      para que el usuario entienda que puede deslizar.
+    */
+    grid-auto-columns: 78%;
+    gap: 0.8rem;
+  }
+
+  .cap-product-images {
+    aspect-ratio: 4 / 5;
+  }
+}
