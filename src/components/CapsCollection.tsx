@@ -14,8 +14,8 @@ const CAP_REFERENCES = [
       "Visualización editorial de un modelo con gorra verde KILLAÉ bordada con figuras andinas",
   },
   {
-    name: "Jardín de altura",
-    imageUrl: "/images/caps/gorra-flores-tierra-editorial-v2.webp",
+    name: "El espíritu guía",
+    imageUrl: "/images/caps/Ayahuma 3.webp",
     imageAlt:
       "Visualización editorial de una modelo con gorra color tierra KILLAÉ bordada con flores",
   },
@@ -54,14 +54,14 @@ const CAPS = [
       "/images/caps/Jardin 3.webp",
     ],
   },
-  {
+  /*{
     name: "Llama",
     images: [
       "/images/caps/Llama 1.webp",
       "/images/caps/Llama 2.webp",
       "/images/caps/Llama 3.webp",
     ],
-  },
+  },*/
   {
     name: "Mariposa",
     images: [
@@ -70,13 +70,13 @@ const CAPS = [
       "/images/caps/Mariposa 3.webp",
     ],
   },
-  {
+ /* {
     name: "Tortuga",
     images: [
       "/images/caps/Tortuga 1.webp",
       "/images/caps/Tortuga 3.webp",
     ],
-  },
+  },*/
   {
     name: "Tucán",
     images: [
@@ -85,14 +85,14 @@ const CAPS = [
       "/images/caps/Tucan 3.webp",
     ],
   },
-  {
+  /*{
     name: "Raíz Verde",
     images: [
       "/images/caps/Baile 1.png",
       "/images/caps/Baile 2.png",
       "/images/caps/gorra-raiz-verde-editorial-v2.webp",
     ],
-  },
+  },*/
 ] as const;
 
 export function CapsCollection() {
