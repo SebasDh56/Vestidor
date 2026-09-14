@@ -7,15 +7,15 @@ const CAP_REFERENCES = [
     imageAlt:
       "Visualización editorial de una modelo con gorra negra KILLAÉ bordada con colibrí y flores",
   },
-  {
-    name: "Ritmo de los Andes",
-    imageUrl: "/images/caps/gorra-raiz-verde-editorial-v2.webp",
-    imageAlt:
-      "Visualización editorial de un modelo con gorra verde KILLAÉ bordada con figuras andinas",
-  },
-  {
+ {
     name: "El espíritu guía",
     imageUrl: "/images/caps/Ayahuma 3.webp",
+    imageAlt:
+      "Visualización editorial de una modelo con gorra color tierra KILLAÉ bordada con flores",
+  },
+  {
+    name: "Jardín de altura",
+    imageUrl: "/images/caps/gorra-flores-tierra-editorial-v2.webp",
     imageAlt:
       "Visualización editorial de una modelo con gorra color tierra KILLAÉ bordada con flores",
   },
